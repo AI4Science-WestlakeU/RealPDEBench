@@ -1,11 +1,11 @@
 
-<a href="url"><img src="https://github.com/AI4Science-WestlakeU/realpdebench/imgs/logo.png" align="center" width="900" ></a>
+<a href="url"><img src="https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/imgs/logo.png" align="center" width="900" ></a>
 
 # RealPDEBench: A Benchmark for Complex Physical Systems with Real-World Data
 
-[arXiv]() ｜ [Website](https://realpdebench.github.io/)｜ [License](https://github.com/AI4Science-WestlakeU/realpdebench/LICENSE)
+[![arXiv](https://img.shields.io/badge/arXiv-xxxx.xxxxx-b31b1b.svg)]() [![Website](https://img.shields.io/badge/Website-realpdebench.github.io-blue)]([https://realm-bench.org/](https://realpdebench.github.io/)) [![License](https://img.shields.io/badge/License-CC--BY--NC--4.0-green.svg)](https://github.com/AI4Science-WestlakeU/realpdebench/LICENSE)
 
-[Peiyan Hu<sup>∗†1,3</sup>](https://peiyannn.github.io/), [Haodong Feng<sup>*1</sup>](https://scholar.google.com/citations?user=0GOKl_gAAAAJ&hl=en), [Hongyuan Liu<sup>*1</sup>](https://orcid.org/0009-0007-0168-0510), Tongtong Yan<sup>2</sup>, Wenhao Deng<sup>1</sup>, Tianrun Gao<sup>†1,4</sup>, Rong Zheng<sup>†1,5</sup>, Haoren Zheng<sup>†1,2</sup>, Chenglei Yu<sup>1</sup>, Chuanrui Wang<sup>1</sup>, Kaiwen Li<sup>†1,2</sup>, Zhi-Ming Ma<sup>3</sup>, Dezhi Zhou<sup>2</sup>, Xingcai Lu<sup>6</sup>, Dixia Fan<sup>1</sup>, [Tailin Wu<sup>†1</sup>](https://tailin.org/).<br />
+[Peiyan Hu](https://peiyannn.github.io/)<sup>∗†1,3</sup>, [Haodong Feng](https://scholar.google.com/citations?user=0GOKl_gAAAAJ&hl=en)<sup>*1</sup>, [Hongyuan Liu](https://orcid.org/0009-0007-0168-0510)<sup>*1</sup>, Tongtong Yan<sup>2</sup>, Wenhao Deng<sup>1</sup>, Tianrun Gao<sup>†1,4</sup>, Rong Zheng<sup>†1,5</sup>, Haoren Zheng<sup>†1,2</sup>, Chenglei Yu<sup>1</sup>, Chuanrui Wang<sup>1</sup>, Kaiwen Li<sup>†1,2</sup>, Zhi-Ming Ma<sup>3</sup>, Dezhi Zhou<sup>2</sup>, Xingcai Lu<sup>6</sup>, Dixia Fan<sup>1</sup>, [Tailin Wu](https://tailin.org/)<sup>†1</sup>.<br />
 
 <sup>1</sup>School of Engineering, Westlake University; 
 <sup>2</sup>Global College, Shanghai Jiao Tong University;
@@ -13,6 +13,8 @@
 <sup>4</sup>Department of Geotechnical Engineering, Tongji University; 
 <sup>5</sup>School of Physics, Peking University;
 <sup>6</sup>Key Laboratory for Power Machinery and Engineering of M. O. E., Shanghai Jiao Tong University<br />
+
+</sup>*</sup>Equal contribution, </sup>†</sup>Corresponding authors
 
 ------
 
@@ -44,7 +46,7 @@ pip install -e .
 ## ⏬ Dataset download (Hugging Face)
 
 
-<a href="url"><img src="https://github.com/AI4Science-WestlakeU/realpdebench/imgs/figure1.png" align="center" width="900" ></a>
+<a href="url"><img src="https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/imgs/figure1.png" align="center" width="1000" ></a>
 
 The dataset repo id is `AI4Science-WestlakeU/RealPDEBench` (HF Datasets).
 
