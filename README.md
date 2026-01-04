@@ -1,7 +1,7 @@
 
 <a href="url"><img src="https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/imgs/logo.png" align="center" width="700" ></a>
 
-# RealPDEBench: A Benchmark for Complex Physical Systems with Real-World Data
+# RealPDEBench: A Benchmark for Complex Physical Systems with Paired Real-World and Simulated Data
 
 [![arXiv](https://img.shields.io/badge/arXiv-xxxx.xxxxx-b31b1b.svg)]() [![Website](https://img.shields.io/badge/Website-realpdebench.github.io-blue)]([https://realm-bench.org/](https://realpdebench.github.io/)) [![License](https://img.shields.io/badge/License-CC--BY--NC--4.0-green.svg)](https://github.com/AI4Science-WestlakeU/realpdebench/LICENSE)
 
@@ -96,16 +96,22 @@ Example:
 ```bash
 python -m realpdebench.train --config configs/fsi/fno.yaml --use_hf_dataset --hf_auto_download --hf_endpoint https://hf-mirror.com
 ```
-------
 
+------
 
 ## 📤 Inference
 
 ```bash
 python -m realpdebench.eval --config configs/fsi/fno.yaml --checkpoint_path /path/to/checkpoint.pth
 ```
+
 ------
 
+## Numerical scripts
+
+Coming soon!
+
+------
 
 ## 👩‍💻 Contribute
 
@@ -117,7 +123,6 @@ We welcome contributions from the community! Please feel free to
 - Improve documentation
 
 ------
-
 
 ## 🫡 Citation
 
