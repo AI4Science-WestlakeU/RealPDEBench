@@ -66,6 +66,11 @@ Tips:
 
 ------
 
+## 📝 Checkpoint & log file download
+
+Coming soon!
+
+------
 
 ## 📥 Training
 
