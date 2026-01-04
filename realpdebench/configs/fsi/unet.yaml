@@ -1,0 +1,34 @@
+exp_name: "unet_fsi"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "fsi"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 10
+normalizer: "gaussian"
+
+# model
+model_name: "unet"
+is_resume: False
+checkpoint_path: './results/unet/unet_fsi_numerical_False/2025-08-21_02-01-23/model_1600.pth' # for resume training
+dim_mults: [1, 2, 4]
+mask_prob: 0.5
+noise_scale: 0.1 # only applicable for numerical data
+
+# training
+is_use_tb: True
+epochs: 200
+step_size: 50
+gamma: 0.5
+train_batch_size: 16
+test_batch_size: 16
+lr: 0.001
+clip_grad_norm: 0.
+scheduler: cosine # step, cosine
+num_update: 10000
+
+# evaluation
+N_plot: 1
+N_autoregressive: 1

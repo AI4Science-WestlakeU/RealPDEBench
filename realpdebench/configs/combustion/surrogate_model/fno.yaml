@@ -1,0 +1,28 @@
+exp_name: "surrogate_fno_combustion"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "combustion"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 10
+normalizer: "gaussian"
+
+# model
+model_name: "fno"
+modes1: 4
+modes2: 16
+modes3: 16
+n_layers: 4
+width: 64
+
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 1000
+train_batch_size: 16
+test_batch_size: 16
+lr: 0.0001
+clip_grad_norm: 0.

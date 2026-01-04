@@ -1,0 +1,54 @@
+
+
+exp_name: "cno_control"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "controlled_cylinder"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian" # gaussian, range, none
+
+# data parameters for training
+mask_prob: 0.1
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: "cno"
+checkpoint_path: ./results/cno/cno_control_numerical_False/2025-09-07_00-40-24/model_4400.pth # for resume training
+
+N_layers: 3 # Number of (D) or (U) blocks in the network                 
+N_res: 1,                 # Number of (R) blocks per level (except the neck)
+N_res_neck: 8,            # Number of (R) blocks in the neck
+channel_multiplier: 32,   # How the number of channels evolve?
+conv_kernel: 3,             # Size of all the kernels
+cutoff_den: 2.0001,       # Filter property 1.
+filter_size: 6,             # Filter property 2.
+
+lrelu_upsampling: 2,      # Filter property 3.
+half_width_mult: 0.8,    # Filter property 4.
+radial: False,            # Filter property 5. Is filter radial?
+batch_norm: True,         # Add BN? We do not add BN in lifting/projection layer
+out_dim: 1,               # Target dimension
+out_size: 1,              # If out_size is 1, Then out_size = in_size. Else must be int
+expand_input: False,      # Start with original in_size, or expand it (pad zeros in the spectrum)
+latent_lift_proj_dim: 64, # Intermediate latent dimension in the lifting/projection layer
+add_inv: True,            # Add invariant block (I) after the intermediate connections?
+activation: 'LeakyReLU'   # Activation function can be 'LeakyReLU' or 'lrelu'
+
+
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 5000
+train_batch_size: 32
+test_batch_size: 64
+lr: 0.0003
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 3
+N_plot: 0

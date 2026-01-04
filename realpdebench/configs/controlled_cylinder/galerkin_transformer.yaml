@@ -1,0 +1,78 @@
+exp_name: "galerkin_transformer_control"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "controlled_cylinder"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian" # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.1
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: "galerkin_transformer"
+checkpoint_path: ./results/galerkin_transformer/galerkin_transformer_control_numerical_False/2025-09-08_15-47-23/model_4500.pth # for resume training
+
+# modes1: 4
+# modes2: 12
+# modes3: 16
+# n_layers: 4
+# width: 64
+
+pos_dim: 1 # pos dim
+n_hidden: 256
+num_feat_layers: 0
+num_encoder_layers: 1
+n_head: 4
+dim_feedforward: 256
+feat_extract_type: null
+attention_type: galerkin
+xavier_init: 0.01
+diagonal_weight: 0.01
+symmetric_init: False
+layer_norm: False
+attn_norm: True
+norm_eps: 0.0000001
+batch_norm: False
+return_attn_weight: False
+return_latent: False
+decoder_type: ifft2
+spacial_dim: 3
+spacial_fc: True
+upsample_mode: interp
+downsample_mode: interp
+freq_dim: 128
+boundary_condition: None
+num_regressor_layers: 1
+fourier_modes_x: 12
+fourier_modes_y: 16
+fourier_modes_t: 4
+regressor_activation: silu
+downscaler_activation: relu
+upscaler_activation: silu
+last_activation: True
+dropout: 0.0
+downscaler_dropout: 0.05
+upscaler_dropout: 0.0
+ffn_dropout: 0.05
+encoder_dropout: 0.05
+decoder_dropout: 0
+debug: False
+
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 5000
+train_batch_size: 32
+test_batch_size: 32
+lr: 0.0001
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 1
+N_plot: 1

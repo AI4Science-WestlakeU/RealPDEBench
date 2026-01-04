@@ -1,0 +1,26 @@
+exp_name: "dmd_control"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "controlled_cylinder"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian"
+
+# model
+model_name: "dmd"
+is_resume: False
+n_modes: 10
+n_predict: 10
+mask_prob: 0.5
+noise_scale: 0.1 # only applicable for numerical data
+input_feature: 2
+checkpoint_path: 'no model needed'
+test_batch_size: 12
+
+
+# evaluation
+N_plot: 1
+N_autoregressive: 1

@@ -1,0 +1,47 @@
+exp_name: "transolver_fsi"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "fsi"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian" # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.5
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: "transolver"
+space_dim: 3
+n_layers: 1
+n_hidden: 256
+n_head: 8
+H: 64
+W: 64
+D: 20
+fun_dim: 0 # 1
+out_dim: 3
+ref: 4
+dropout: 0.1
+act: "gelu"
+mlp_ratio: 4
+slice_num: 16
+
+checkpoint_path: "./results/transolver/fno_fsi_numerical_False/2025-08-25_07-21-53/model_2900.pth"
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 5000
+test_interval: 200
+train_batch_size: 32
+test_batch_size: 32
+lr: 0.001
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 3
+N_plot: 5

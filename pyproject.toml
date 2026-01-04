@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "realpdebench"
+version = "0.1.0"
+description = "RealPDEBench: paired real-world and simulated data benchmark for complex physical systems."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Peiyan Hu", email = "hupeiyan18@mails.ucas.ac.cn" },
+]
+keywords = [
+  "scientific-ml",
+  "physics",
+  "pde",
+  "sim-to-real",
+  "fluid-dynamics",
+  "combustion",
+  "spatiotemporal",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "License :: Free for non-commercial use",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+  "numpy",
+  "scipy",
+  "matplotlib",
+  "tqdm",
+  "torch",
+  "torchvision",
+  "torchinfo",
+  "h5py",
+  "pyyaml",
+  "tensorboard",
+  "einops",
+  "einops-exts",
+  "rotary-embedding-torch",
+  "PyWavelets",
+  "pytorch-wavelets",
+  "ptwt",
+  "pandas",
+  "timm",
+  "seaborn",
+  "psutil",
+  "requests",
+  "huggingface-hub",
+  "datasets",
+]
+
+[project.urls]
+Homepage = "https://realpdebench.github.io/"
+
+[project.scripts]
+realpdebench = "realpdebench.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["realpdebench", "realpdebench.*"]
+
+[tool.setuptools.package-data]
+realpdebench = ["configs/**/*.yaml", "configs/**/*.yml"]
+
+

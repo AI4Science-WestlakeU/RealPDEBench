@@ -1,0 +1,43 @@
+
+
+exp_name: "mwt_combustion"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "combustion"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian" # gaussian, range, none
+
+# data parameters for training
+mask_prob: 0.5
+noise_scale: 0.0 # only applicable for numerical data
+
+# model
+model_name: "mwt"
+checkpoint_path: "./results/mwt/mwt_combustion_numerical_False/2025-09-18_14-45-34/model_3800.pth"
+
+k: 3            # wavelet filter size
+alpha: 5        # fourier filter parameter, should be less or equal to T/2
+c: 4            # increase factor
+nCZ: 4         # number of CZ blocks
+L: 0
+base: "legendre" # chebyshev
+
+
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 5000
+test_interval: 200
+train_batch_size: 32
+test_batch_size: 64
+lr: 0.001
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 3
+N_plot: 5

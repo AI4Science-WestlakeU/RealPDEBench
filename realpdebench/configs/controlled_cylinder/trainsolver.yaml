@@ -1,0 +1,47 @@
+exp_name: "transolver_control"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "controlled_cylinder"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian" # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.1
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: "transolver"
+space_dim: 5
+n_layers: 1
+n_hidden: 256
+n_head: 8
+H: 64
+W: 128
+D: 10
+fun_dim: 0 # 1
+out_dim: 3
+ref: 4
+dropout: 0.1
+act: "gelu"
+mlp_ratio: 4
+slice_num: 16
+
+checkpoint_path: "./results/transolver/transolver_control_numerical_False/2025-09-09_12-46-08/model_2100.pth"
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 5000
+test_interval: 200
+train_batch_size: 32
+test_batch_size: 32
+lr: 0.001
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 2
+N_plot: 0

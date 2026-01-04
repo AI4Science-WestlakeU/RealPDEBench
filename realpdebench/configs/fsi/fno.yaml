@@ -1,0 +1,37 @@
+exp_name: "fno_fsi"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "fsi"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian" # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.5
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: "fno"
+checkpoint_path: /ssdwork./results/fno/fno_fsi_numerical_False/2025-08-18_13-06-26/model_2300.pth
+modes1: 4
+modes2: 16
+modes3: 16
+n_layers: 4
+width: 128
+
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 5000
+train_batch_size: 32
+test_batch_size: 64
+lr: 0.01
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 1
+N_plot: 0

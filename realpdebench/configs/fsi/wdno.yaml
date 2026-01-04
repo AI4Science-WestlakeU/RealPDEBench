@@ -1,0 +1,41 @@
+exp_name: "wdno_fsi"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "fsi"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "none" # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.5
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: "wdno"
+checkpoint_path: /ssdwork./results/wdno/wdno_fsi_numerical_False/2025-08-21_16-18-03/model_24000.pth
+dim: 128
+dim_mults: [1, 2, 4]
+wave_type: "bior1.1"
+pad_mode: "zero"
+beta_schedule: "sigmoid"
+
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 0 # only applicable for step scheduler
+num_update: 120000
+train_batch_size: 16
+test_batch_size: 64
+lr: 0.00005
+clip_grad_norm: 1.0
+
+# sampling
+sampling_timesteps: 25 # number of sampling timesteps (ddim for faster inference)
+ddim_sampling_eta: 1.
+
+# evaluation
+N_autoregressive: 1
+N_plot: 0

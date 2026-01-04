@@ -1,0 +1,54 @@
+exp_name: "dpot_l_cylinder"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "cylinder"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 16
+normalizer: "gaussian" # gaussian, range, none
+
+# data parameters for training
+mask_prob: 0.1
+noise_scale: 0.5 # only applicable for numerical data
+
+# model
+model_name: "dpot"
+checkpoint_path: "./dpot_ckpts/model_L.pth"  # Large DPOT model
+model_type: "dpot"  # "dpot" or "dpot3d"
+
+# DPOT specific parameters (Large model configuration - from checkpoint)
+img_size: 128       # Pre-trained model resolution (with auto-resize for combustion)
+patch_size: 8
+in_channels: 4      # We follow the original DPOT workflow to pad the channels to 4, if channels is less than 4
+out_channels: 4     # We follow the original DPOT workflow to pad the channels to 4, if channels is less than 4
+embed_dim: 1536     
+depth: 24            
+n_blocks: 16         
+modes: 32           # Keep default modes for AFNO
+mlp_ratio: 4        
+out_layer_dim: 1536   # Match checkpoint out layer dim
+normalize: False
+act: "gelu"
+time_agg: "exp_mlp"
+n_cls: 12            # Match checkpoint pre-training (12 datasets)
+
+# dpot multi-step specific parameters (from checkpoint)
+in_timesteps: 20
+out_timesteps: 20
+
+# training
+is_use_tb: True
+scheduler: "cosine" # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 2000         
+train_batch_size: 16
+test_batch_size: 64
+lr: 0.0001
+clip_grad_norm: 1
+
+# evaluation
+N_autoregressive: 1
+N_plot: 5
+

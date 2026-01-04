@@ -1,0 +1,47 @@
+exp_name: "foil"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "foil"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian" # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.1
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: "transolver"
+space_dim: 3
+n_layers: 1
+n_hidden: 256
+n_head: 8
+H: 128
+W: 64
+D: 20
+fun_dim: 0 # 1
+out_dim: 3
+ref: 4
+dropout: 0.1
+act: "gelu"
+mlp_ratio: 4
+slice_num: 16
+
+checkpoint_path: ./results/transolver/foil_numerical_False/2025-09-18_01-26-24/model_1100.pth
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 5000
+test_interval: 200
+train_batch_size: 16
+test_batch_size: 16
+lr: 0.0007
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 1
+N_plot: 1

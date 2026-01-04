@@ -1,0 +1,30 @@
+name: realpdebench
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - psutil
+    - requests
+    - numpy
+    - scipy
+    - matplotlib
+    - tqdm
+    - torchinfo
+    - torch
+    - h5py
+    - pyyaml
+    - tensorboard
+    - einops
+    - torchvision
+    - einops_exts
+    - rotary_embedding_torch
+    - PyWavelets
+    - pytorch-wavelets
+    - ptwt
+    - IPython
+    - huggingface-hub
+    - pandas
+    - timm
+    - seaborn
+    - yaml
+    - datasets

@@ -1,0 +1,27 @@
+realpdebench/results
+
+__pycache__/
+*.pyc
+
+.DS_Store
+
+# Packaging/build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Local caches
+.pytest_cache/
+
+# Private / local-only dirs (do not commit)
+proj_docs/
+papers/
+ref_codes/
+logs/
+
+# Dev/debug folders not part of the packaged library
+sandbox/
+real_benchmark_old/
+scripts/
+hf_upload_test/

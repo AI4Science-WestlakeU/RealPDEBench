@@ -1,0 +1,35 @@
+exp_name: deeponet_foil
+gpu: 0
+seed: 1234567
+results_path: ./results/
+
+# data
+dataset_name: foil
+dataset_root: /wutailin/real_benchmark/
+num_workers: 12
+normalizer: gaussian   # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.1
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: deeponet
+checkpoint_path: ./results/deeponet/deeponet_foil_numerical_False/2025-09-19_01-39-51/model_0160.pth
+
+p: 256
+dropout_rate: 0
+
+# training
+is_use_tb: true
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 4000
+train_batch_size: 32
+test_batch_size: 64
+lr: 0.0001
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 1
+N_plot: 1

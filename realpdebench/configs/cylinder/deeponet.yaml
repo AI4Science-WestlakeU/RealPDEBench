@@ -1,0 +1,38 @@
+exp_name: deeponet_cylinder
+gpu: 0
+seed: 0
+results_path: ./results/
+
+# data
+dataset_name: cylinder
+dataset_root: /wutailin/real_benchmark/
+num_workers: 12   
+normalizer: gaussian   # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.1
+noise_scale: 0.1 # only applicable for numerical data
+
+# model
+model_name: deeponet
+checkpoint_path: 
+  ./results/deeponet/deeponet_cylinder_numerical_False/2025-09-14_19-05-53/model_0200.pth
+p: 128
+dropout_rate: 0.1
+
+# training
+is_use_tb: true
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 5000
+train_batch_size: 32
+test_batch_size: 64
+lr: 0.0001
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 10
+N_plot: 1
+probe_diagnostic: True
+N_plot_probe: 12
+

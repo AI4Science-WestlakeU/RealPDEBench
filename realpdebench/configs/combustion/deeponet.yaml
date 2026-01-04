@@ -1,0 +1,34 @@
+exp_name: "deeponet_combustion"
+gpu: 0
+seed: 0
+results_path: "./results/"
+
+# data
+dataset_name: "combustion"
+dataset_root: "/wutailin/real_benchmark/"
+num_workers: 12
+normalizer: "gaussian" # none, gaussian, range
+
+# data parameters for training
+mask_prob: 0.5
+noise_scale: 0.0 # only applicable for numerical data
+
+# model
+model_name: "deeponet"
+checkpoint_path: ./results/deeponet/deeponet_combustion_numerical_False/2025-09-16_22-50-38/model_2220.pth # for resume training and evaluation
+p: 128
+dropout_rate: 0.1
+
+# training
+is_use_tb: True
+scheduler: cosine # step, cosine
+step_size: 1000 # only applicable for step scheduler
+num_update: 3000
+train_batch_size: 64
+test_batch_size: 64
+lr: 0.0005
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 1
+N_plot: 1
