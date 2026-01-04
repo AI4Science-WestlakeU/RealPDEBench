@@ -1,5 +1,5 @@
 
-<a href="url"><img src="https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/imgs/logo.png" align="center" width=700" ></a>
+<a href="url"><img src="https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/imgs/logo.png" align="center" width="700" ></a>
 
 # RealPDEBench: A Benchmark for Complex Physical Systems with Real-World Data
 
