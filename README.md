@@ -3,7 +3,7 @@
 
 # RealPDEBench: A Benchmark for Complex Physical Systems with Paired Real-World and Simulated Data
 
-[![arXiv](https://img.shields.io/badge/arXiv-xxxx.xxxxx-b31b1b.svg)]() [![Website](https://img.shields.io/badge/Website-realpdebench.github.io-blue)]([https://realm-bench.org/](https://realpdebench.github.io/)) [![License](https://img.shields.io/badge/License-CC--BY--NC--4.0-green.svg)](https://github.com/AI4Science-WestlakeU/realpdebench/LICENSE)
+[![arXiv](https://img.shields.io/badge/arXiv-xxxx.xxxxx-b31b1b.svg)]() [![Website](https://img.shields.io/badge/Website-realpdebench.github.io-blue)](https://realpdebench.github.io/) [![License](https://img.shields.io/badge/License-CC--BY--NC--4.0-green.svg)](https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/LICENSE)
 
 [Peiyan Hu](https://peiyannn.github.io/)<sup>∗†1,3</sup>, [Haodong Feng](https://scholar.google.com/citations?user=0GOKl_gAAAAJ&hl=en)<sup>*1</sup>, [Hongyuan Liu](https://orcid.org/0009-0007-0168-0510)<sup>*1</sup>, Tongtong Yan<sup>2</sup>, Wenhao Deng<sup>1</sup>, Tianrun Gao<sup>†1,4</sup>, Rong Zheng<sup>†1,5</sup>, Haoren Zheng<sup>†1,2</sup>, Chenglei Yu<sup>1</sup>, Chuanrui Wang<sup>1</sup>, Kaiwen Li<sup>†1,2</sup>, Zhi-Ming Ma<sup>3</sup>, Dezhi Zhou<sup>2</sup>, Xingcai Lu<sup>6</sup>, Dixia Fan<sup>1</sup>, [Tailin Wu](https://tailin.org/)<sup>†1</sup>.<br />
 
@@ -28,15 +28,17 @@ for complex physical systems, designed for **spatiotemporal forecasting** and **
 - **[5 Datasets](https://realpdebench.github.io/datasets/)**: `cylinder`, `fsi`, `controlled_cylinder`, `foil`, `combustion`
 - **[700+ Trajectories](https://realpdebench.github.io/datasets/#dataset-inventory)**
 - **[10 Baseline models](https://realpdebench.github.io/models/)**: U-Net, FNO, CNO, WDNO, DeepONet, MWT, GK-Transformer, Transolver, DPOT, DMD
-- **[8 Evaluation metrics](https://realpdebench.github.io/metrics/)**: RMSE, MAE, Rel L₂, R², fRMSE, FE, KE, MVPE
+- **[9 Evaluation metrics](https://realpdebench.github.io/metrics/)**: RMSE, MAE, Rel L₂, R², Update Ratio, fRMSE, FE, KE, MVPE
 
 ------
 
 ## 🎬 Installation (pip)
 
-This repo is packaged with `pyproject.toml` and can be installed via pip:
+This repo is packaged with `pyproject.toml` and can be installed via pip (requires Python ≥ 3.10):
 
 ```bash
+git clone https://github.com/AI4Science-WestlakeU/RealPDEBench.git
+cd ReaLPDEBench
 pip install -e .
 ```
 
