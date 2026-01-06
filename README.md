@@ -6,7 +6,7 @@
 # RealPDEBench: A Benchmark for Complex Physical Systems with Paired Real-World and Simulated Data
 
 [![HF Dataset](https://img.shields.io/badge/HF%20Dataset-RealPDEBench-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench)
-[![Paper](https://img.shields.io/badge/Paper-coming%20soon-6c757d?style=for-the-badge&logo=arxiv&logoColor=white)](https://realpdebench.github.io/)
+[![arXiv](https://img.shields.io/badge/arXiv-2601.01829-6c757d?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2601.01829)
 [![Website & Docs](https://img.shields.io/badge/Website%20%26%20Docs-realpdebench.github.io-1f6feb?style=for-the-badge&logo=google-chrome&logoColor=white)](https://realpdebench.github.io/)
 [![Codebase](https://img.shields.io/badge/Codebase-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AI4Science-WestlakeU/RealPDEBench)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-9cf?style=for-the-badge&logo=creativecommons&logoColor=white)](https://creativecommons.org/licenses/by-nc/4.0/)
