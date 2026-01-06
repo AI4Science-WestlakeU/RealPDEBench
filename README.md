@@ -1,9 +1,15 @@
 
-<a href="url"><img src="https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/imgs/logo.png" align="center" width="700" ></a>
+<p align="center">
+  <img src="imgs/logo.png" alt="RealPDEBench logo" width="700" />
+</p>
 
 # RealPDEBench: A Benchmark for Complex Physical Systems with Paired Real-World and Simulated Data
 
-[![arXiv](https://img.shields.io/badge/arXiv-xxxx.xxxxx-b31b1b.svg)]() [![Website](https://img.shields.io/badge/Website-realpdebench.github.io-blue)](https://realpdebench.github.io/) [![License](https://img.shields.io/badge/License-CC--BY--NC--4.0-green.svg)](https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/LICENSE)
+[![HF Dataset](https://img.shields.io/badge/HF%20Dataset-RealPDEBench-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench)
+[![Paper](https://img.shields.io/badge/Paper-coming%20soon-6c757d?style=for-the-badge&logo=arxiv&logoColor=white)](https://realpdebench.github.io/)
+[![Website & Docs](https://img.shields.io/badge/Website%20%26%20Docs-realpdebench.github.io-1f6feb?style=for-the-badge&logo=google-chrome&logoColor=white)](https://realpdebench.github.io/)
+[![Codebase](https://img.shields.io/badge/Codebase-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AI4Science-WestlakeU/RealPDEBench)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-9cf?style=for-the-badge&logo=creativecommons&logoColor=white)](https://creativecommons.org/licenses/by-nc/4.0/)
 
 [Peiyan Hu](https://peiyannn.github.io/)<sup>∗†1,3</sup>, [Haodong Feng](https://scholar.google.com/citations?user=0GOKl_gAAAAJ&hl=en)<sup>*1</sup>, [Hongyuan Liu](https://orcid.org/0009-0007-0168-0510)<sup>*1</sup>, Tongtong Yan<sup>2</sup>, Wenhao Deng<sup>1</sup>, Tianrun Gao<sup>†1,4</sup>, Rong Zheng<sup>†1,5</sup>, Haoren Zheng<sup>†1,2</sup>, Chenglei Yu<sup>1</sup>, Chuanrui Wang<sup>1</sup>, Kaiwen Li<sup>†1,2</sup>, Zhi-Ming Ma<sup>3</sup>, Dezhi Zhou<sup>2</sup>, Xingcai Lu<sup>6</sup>, Dixia Fan<sup>1</sup>, [Tailin Wu](https://tailin.org/)<sup>†1</sup>.<br />
 
