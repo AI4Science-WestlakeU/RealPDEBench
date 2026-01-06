@@ -5,11 +5,11 @@
 
 # RealPDEBench: A Benchmark for Complex Physical Systems with Paired Real-World and Simulated Data
 
-[![HF Dataset](https://img.shields.io/badge/HF%20Dataset-RealPDEBench-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench)
-[![arXiv](https://img.shields.io/badge/arXiv-2601.01829-6c757d?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2601.01829)
-[![Website & Docs](https://img.shields.io/badge/Website%20%26%20Docs-realpdebench.github.io-1f6feb?style=for-the-badge&logo=google-chrome&logoColor=white)](https://realpdebench.github.io/)
-[![Codebase](https://img.shields.io/badge/Codebase-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AI4Science-WestlakeU/RealPDEBench)
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-9cf?style=for-the-badge&logo=creativecommons&logoColor=white)](https://creativecommons.org/licenses/by-nc/4.0/)
+[![HF Dataset](https://img.shields.io/badge/HF%20Dataset-RealPDEBench-FFD21E?logo=huggingface)](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench)
+[![arXiv](https://img.shields.io/badge/arXiv-2601.01829-b31b1b?logo=arxiv)](https://arxiv.org/abs/2601.01829)
+[![Website & Docs](https://img.shields.io/badge/Website%20%26%20Docs-realpdebench.github.io-1f6feb?logo=google-chrome)](https://realpdebench.github.io/)
+[![Codebase](https://img.shields.io/badge/Codebase-GitHub-181717?logo=github)](https://github.com/AI4Science-WestlakeU/RealPDEBench)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-9cf?logo=creativecommons&logoColor=white)](https://creativecommons.org/licenses/by-nc/4.0/)
 
 [Peiyan Hu](https://peiyannn.github.io/)<sup>∗†1,3</sup>, [Haodong Feng](https://scholar.google.com/citations?user=0GOKl_gAAAAJ&hl=en)<sup>*1</sup>, [Hongyuan Liu](https://orcid.org/0009-0007-0168-0510)<sup>*1</sup>, Tongtong Yan<sup>2</sup>, Wenhao Deng<sup>1</sup>, Tianrun Gao<sup>†1,4</sup>, Rong Zheng<sup>†1,5</sup>, Haoren Zheng<sup>†1,2</sup>, Chenglei Yu<sup>1</sup>, Chuanrui Wang<sup>1</sup>, Kaiwen Li<sup>†1,2</sup>, Zhi-Ming Ma<sup>3</sup>, Dezhi Zhou<sup>2</sup>, Xingcai Lu<sup>6</sup>, Dixia Fan<sup>1</sup>, [Tailin Wu](https://tailin.org/)<sup>†1</sup>.<br />
 
@@ -137,8 +137,14 @@ We welcome contributions from the community! Please feel free to
 If you find our work and/or our code useful, please cite us via:
 
 ```bibtex
-@article{
-
+@misc{hu2026realpdebenchbenchmarkcomplexphysical,
+      title={RealPDEBench: A Benchmark for Complex Physical Systems with Real-World Data}, 
+      author={Peiyan Hu and Haodong Feng and Hongyuan Liu and Tongtong Yan and Wenhao Deng and Tianrun Gao and Rong Zheng and Haoren Zheng and Chenglei Yu and Chuanrui Wang and Kaiwen Li and Zhi-Ming Ma and Dezhi Zhou and Xingcai Lu and Dixia Fan and Tailin Wu},
+      year={2026},
+      eprint={2601.01829},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2601.01829}, 
 }
 ```
 
