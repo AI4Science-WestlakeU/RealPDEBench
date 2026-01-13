@@ -51,12 +51,14 @@ pip install -e .
 ------
 
 
-## ⏬ Dataset download (Hugging Face)
+## ⏬ Dataset download
 
 
 <a href="url"><img src="https://github.com/AI4Science-WestlakeU/RealPDEBench/blob/main/imgs/figure1.png" align="center" width="1000" ></a>
 
-The dataset repo id is `AI4Science-WestlakeU/RealPDEBench` (HF Datasets).
+### Hugging Face dataset: 
+
+The repo id `AI4Science-WestlakeU/RealPDEBench`.
 
 We provide a small pattern-based downloader:
 
@@ -71,6 +73,10 @@ realpdebench download --dataset-root /path/to/data --scenario fsi --what hf_data
 Tips:
 - If you hit rate limits (HTTP 429) or need auth, login and set env `HF_TOKEN=...`.
 - We recommend setting env `HF_HUB_DISABLE_XET=1`.
+
+### HDF5-format dataset
+
+Coming soon!
 
 ------
 
