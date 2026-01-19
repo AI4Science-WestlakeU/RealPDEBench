@@ -46,7 +46,7 @@ def _add_download_subcommand(subparsers: argparse._SubParsersAction) -> None:
         "--split",
         action="append",
         choices=["train", "val", "test"],
-        help="Split for hf_dataset download. Repeatable. Default: all.",
+        help="Split index files to download (trajectories are not split dirs). Repeatable. Default: all.",
     )
     p.add_argument(
         "--include-surrogate-train",

@@ -48,7 +48,7 @@ def build_allow_patterns(
         scenarios: Scenario folders to include (e.g., "fsi").
         what: Which artifacts to download.
             - "metadata": only JSON metadata under each scenario (test_mode groups).
-            - "hf_dataset": only Arrow shards under `{scenario}/hf_dataset/...`.
+            - "hf_dataset": Arrow shards + index JSONs under `{scenario}/hf_dataset/...`.
             - "all": both metadata and hf_dataset.
         dataset_types: Which dataset types to include for hf_dataset ("real", "numerical").
             If None, includes both.
@@ -82,8 +82,9 @@ def build_allow_patterns(
             )
         if what in {"hf_dataset", "all"}:
             for dt in dataset_types:
+                patterns.append(f"{scenario}/hf_dataset/{dt}/**")
                 for sp in splits:
-                    patterns.append(f"{scenario}/hf_dataset/{dt}_{sp}/**")
+                    patterns.append(f"{scenario}/hf_dataset/{sp}_index_{dt}.json")
 
         if include_surrogate_train:
             if scenario != "combustion":
@@ -194,9 +195,10 @@ def ensure_hf_artifacts(
     This is intended to be used by HF Arrow-backed dataset wrappers.
     """
     dataset_root_path = Path(dataset_root).expanduser().resolve()
-    arrow_path = dataset_root_path / scenario / "hf_dataset" / f"{dataset_type}_{split}"
+    trajectory_path = dataset_root_path / scenario / "hf_dataset" / dataset_type
+    index_path = dataset_root_path / scenario / "hf_dataset" / f"{split}_index_{dataset_type}.json"
 
-    if arrow_path.exists():
+    if trajectory_path.exists() and index_path.exists():
         # NOTE: test params jsons are checked separately by dataset wrappers.
         return
 

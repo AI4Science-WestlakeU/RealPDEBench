@@ -1,83 +1,74 @@
 #!/usr/bin/env python3
 """
-HDF5 to HuggingFace Dataset Conversion Script for RealBench Datasets.
+HDF5 to HuggingFace Dataset Conversion Script - V2 (Lazy Slicing).
 
-This script converts HDF5-based datasets to HuggingFace Datasets format with
-automatic sharding (~500MB per shard) for Hub compatibility.
+This script converts HDF5-based datasets to HuggingFace Datasets format using
+the LAZY SLICING approach: store complete trajectories and separate index files.
 
-Unlike convert_hdf5_to_parquet.py which produces raw Parquet files, this script
-uses HF Datasets' native functions for proper sharding and metadata.
+Key differences from V1 (pre-slicing):
+- Stores COMPLETE trajectories (no pre-slicing by horizon)
+- Each sim_id is stored only ONCE (no overlap)
+- Index files (JSON) map (sim_id, time_id) for train/val/test splits
+- Supports dynamic N_autoregressive at runtime
 
-Usage:
-    # Convert a single dataset
-    python scripts/convert_hdf5_to_hf.py \
-        --dataset_name fluid_single_cylinder \
-        --dataset_root /wutailin/real_benchmark/
-
-    # Convert all datasets
-    python scripts/convert_hdf5_to_hf.py \
-        --dataset_name all \
-        --dataset_root /wutailin/real_benchmark/
-
-    # Convert with custom shard size (in bytes)
-    python scripts/convert_hdf5_to_hf.py \
-        --dataset_name fluid_single_cylinder \
-        --dataset_root /wutailin/real_benchmark/ \
-        --max_shard_size 500MB
-
-Supported datasets:
-    - combustion (single_injector_128)
-    - cylinder (fluid_single_cylinder)
-    - fsi (fluid_double_cylinder)
-    - controlled_cylinder (fluid_control)
-    - foil (fluid_foil)
-
-Output structure:
+Output structure (NEW):
     {dataset_root}/{dataset_name}/hf_dataset/
-    ├── real_train/
-    │   ├── data-00000-of-00005.arrow
-    │   ├── data-00001-of-00005.arrow
-    │   ├── ...
+    ├── real/                          # Arrow: complete trajectories
+    │   ├── data-00000-of-XXXXX.arrow
     │   ├── dataset_info.json
     │   └── state.json
-    ├── real_val/
-    ├── real_test/
-    ├── numerical_train/
-    ├── numerical_val/
-    └── numerical_test/
+    ├── numerical/                     # Arrow: complete trajectories
+    │   ├── data-00000-of-XXXXX.arrow
+    │   ├── dataset_info.json
+    │   └── state.json
+    ├── train_index_real.json          # Index files
+    ├── val_index_real.json
+    ├── test_index_real.json
+    ├── train_index_numerical.json
+    ├── val_index_numerical.json
+    └── test_index_numerical.json
 
-Schema (same as Parquet approach):
+Schema (NEW - complete trajectories):
     Fluid datasets:
         - sim_id: str
-        - time_id: int
-        - u: bytes (np.float32, shape (horizon, H, W))
-        - v: bytes (np.float32, shape (horizon, H, W))
-        - p: bytes (np.float32, shape (horizon, H, W)) - numerical only
+        - u: bytes (np.float32, shape (T_full, H, W))  # Complete trajectory
+        - v: bytes (np.float32, shape (T_full, H, W))
+        - p: bytes (np.float32, shape (T_full, H, W)) - numerical only
         - shape_t, shape_h, shape_w: int
 
     Combustion datasets:
         - sim_id: str
-        - time_id: int
-        - observed: bytes (np.float32, shape (horizon, H, W))
-        - numerical: bytes (np.float32, shape (horizon, H, W, 15)) - numerical only
+        - observed: bytes (np.float32, shape (T_full, H, W))
+        - numerical: bytes (np.float32, shape (T_full, H, W, 15)) - numerical only
         - shape_t, shape_h, shape_w: int
         - numerical_channels: int - numerical only
+
+Usage:
+    python -m realpdebench.utils.convert_hdf5_to_hf \
+        --dataset_name fsi \
+        --dataset_root /wutailin/real_benchmark/
+
+    python -m realpdebench.utils.convert_hdf5_to_hf \
+        --dataset_name all \
+        --dataset_root /wutailin/real_benchmark/
 """
 
 import os
 import sys
+import json
 import argparse
 import logging
-import json
+import re
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Iterator, Any
+from typing import Dict, List, Tuple, Optional, Iterator, Any, Set
 from dataclasses import dataclass
 
 import numpy as np
 import torch
 import h5py
 from tqdm import tqdm
-from datasets import Dataset, Features, Value, Sequence
+from datasets import Dataset, Features, Value
+
 
 
 @dataclass
@@ -88,14 +79,13 @@ class DatasetConfig:
     file_pattern: str
     sub_s_real: int
     sub_s_numerical: int
-    horizon: int
     real_keys: List[str]
     numerical_keys: List[str]
     surrogate_path: Optional[str] = None
     numerical_channel: int = 0
 
 
-# Dataset configurations (same as convert_hdf5_to_parquet.py)
+# Dataset configurations
 DATASET_CONFIGS = {
     "combustion": DatasetConfig(
         name="combustion",
@@ -103,7 +93,6 @@ DATASET_CONFIGS = {
         file_pattern=r"\d+NH3_\d+\.?\d*\.h5",
         sub_s_real=2,
         sub_s_numerical=2,
-        horizon=40,
         real_keys=["trajectory"],
         numerical_keys=["measured_data"],
         surrogate_path="surrogate",
@@ -115,7 +104,6 @@ DATASET_CONFIGS = {
         file_pattern=r"\d+\.h5",
         sub_s_real=1,
         sub_s_numerical=2,
-        horizon=40,
         real_keys=["measured_data/u", "measured_data/v"],
         numerical_keys=["measured_data/u", "measured_data/v", "measured_data/p"],
     ),
@@ -125,7 +113,6 @@ DATASET_CONFIGS = {
         file_pattern=r"\d+_[\d\.]+_[\d\.]+_\d+\.h5",
         sub_s_real=2,
         sub_s_numerical=2,
-        horizon=40,
         real_keys=["measured_data/u", "measured_data/v"],
         numerical_keys=["measured_data/u", "measured_data/v", "measured_data/p"],
     ),
@@ -135,7 +122,6 @@ DATASET_CONFIGS = {
         file_pattern=r"\d+_\d+\.?\d*\.h5",
         sub_s_real=1,
         sub_s_numerical=2,
-        horizon=20,
         real_keys=["measured_data/u", "measured_data/v"],
         numerical_keys=["measured_data/u", "measured_data/v", "measured_data/p"],
     ),
@@ -145,7 +131,6 @@ DATASET_CONFIGS = {
         file_pattern=r"\d+_\d+\.?\d*\.h5",
         sub_s_real=2,
         sub_s_numerical=2,
-        horizon=40,
         real_keys=["measured_data/u", "measured_data/v"],
         numerical_keys=["measured_data/u", "measured_data/v", "measured_data/p"],
     ),
@@ -222,7 +207,6 @@ def export_test_params_pt_to_json(
     
     return outputs
 
-
 def load_mapping_files(dataset_dir: str, dataset_type: str) -> Tuple[Dict, Dict]:
     """Load pre-computed sim_id and time_id mappings from .pt files."""
     sim_id_path = os.path.join(dataset_dir, f"sim_id_mapping_{dataset_type}.pt")
@@ -239,84 +223,44 @@ def load_mapping_files(dataset_dir: str, dataset_type: str) -> Tuple[Dict, Dict]
     return sim_id_mapping, time_id_mapping
 
 
-def load_fluid_sample(
-    h5_path: str,
-    time_id: int,
-    horizon: int,
-    sub_s: int,
-    is_numerical: bool,
-) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
-    """Load a fluid dataset sample from HDF5."""
-    with h5py.File(h5_path, "r") as f:
-        u = f["measured_data"]["u"][time_id:time_id + horizon, ::sub_s, ::sub_s]
-        v = f["measured_data"]["v"][time_id:time_id + horizon, ::sub_s, ::sub_s]
-        
-        if is_numerical:
-            p = f["measured_data"]["p"][time_id:time_id + horizon, ::sub_s, ::sub_s]
-        else:
-            p = None
-    
-    return u, v, p
+def get_unique_sim_ids(sim_id_mapping: Dict[str, List[str]]) -> Set[str]:
+    """Get all unique sim_ids across all splits."""
+    unique_ids = set()
+    for split in ["train", "val", "test"]:
+        if split in sim_id_mapping:
+            unique_ids.update(sim_id_mapping[split])
+    return unique_ids
 
 
-def load_combustion_sample(
-    real_path: Optional[str],
-    surrogate_path: Optional[str],
-    numerical_path: Optional[str],
-    time_id: int,
-    horizon: int,
-    sub_s: int,
-    is_numerical: bool,
-) -> Tuple[np.ndarray, Optional[np.ndarray]]:
-    """Load a combustion dataset sample from HDF5."""
-    if is_numerical:
-        with h5py.File(surrogate_path, "r") as f:
-            observed = f["measured_data"][time_id:time_id + horizon, ::sub_s, ::sub_s]
-        with h5py.File(numerical_path, "r") as f:
-            numerical = f["measured_data"][time_id:time_id + horizon, ::sub_s, ::sub_s]
-    else:
-        with h5py.File(real_path, "r") as f:
-            observed = f["trajectory"][time_id:time_id + horizon, ::sub_s, ::sub_s]
-        numerical = None
-    
-    return observed, numerical
-
-
-def fluid_generator(
-    dataset_dir: str,
+def fluid_trajectory_generator(
     data_path: str,
     sim_ids: List[str],
-    time_ids: List[int],
-    horizon: int,
     sub_s: int,
     is_numerical: bool,
 ) -> Iterator[Dict[str, Any]]:
-    """Generator for fluid dataset samples."""
-    for sim_id, time_id in tqdm(
-        zip(sim_ids, time_ids),
-        total=len(sim_ids),
-        desc="Generating",
-    ):
+    """Generator for complete fluid trajectories."""
+    for sim_id in tqdm(sim_ids, desc="Loading trajectories"):
         h5_path = os.path.join(data_path, sim_id)
         
         try:
-            u, v, p = load_fluid_sample(
-                h5_path=h5_path,
-                time_id=time_id,
-                horizon=horizon,
-                sub_s=sub_s,
-                is_numerical=is_numerical,
-            )
+            with h5py.File(h5_path, "r") as f:
+                # Load COMPLETE trajectory (no slicing by horizon)
+                u = f["measured_data"]["u"][:, ::sub_s, ::sub_s]
+                v = f["measured_data"]["v"][:, ::sub_s, ::sub_s]
+                
+                if is_numerical:
+                    p = f["measured_data"]["p"][:, ::sub_s, ::sub_s]
+                else:
+                    p = None
             
             u = u.astype(np.float32)
             v = v.astype(np.float32)
             
             record = {
                 "sim_id": sim_id,
-                "time_id": time_id,
                 "u": u.tobytes(),
                 "v": v.tobytes(),
-                "shape_t": u.shape[0],
+                "shape_t": u.shape[0],  # Complete trajectory length
                 "shape_h": u.shape[1],
                 "shape_w": u.shape[2],
             }
@@ -327,53 +271,43 @@ def fluid_generator(
             yield record
             
         except Exception as e:
-            logging.warning(f"Error loading {h5_path} at time_id={time_id}: {e}")
+            logging.warning(f"Error loading {h5_path}: {e}")
             continue
 
 
-def combustion_generator(
-    dataset_dir: str,
+def combustion_trajectory_generator(
     data_path: str,
     surrogate_path: Optional[str],
     sim_ids: List[str],
-    time_ids: List[int],
-    horizon: int,
     sub_s: int,
     is_numerical: bool,
+    numerical_channel: int,
 ) -> Iterator[Dict[str, Any]]:
-    """Generator for combustion dataset samples."""
-    for sim_id, time_id in tqdm(
-        zip(sim_ids, time_ids),
-        total=len(sim_ids),
-        desc="Generating",
-    ):
-        if is_numerical:
-            real_path = None
-            surrogate_h5 = os.path.join(surrogate_path, sim_id)
-            numerical_h5 = os.path.join(data_path, sim_id)
-        else:
-            real_path = os.path.join(data_path, sim_id)
-            surrogate_h5 = None
-            numerical_h5 = None
-        
+    """Generator for complete combustion trajectories."""
+    for sim_id in tqdm(sim_ids, desc="Loading trajectories"):
         try:
-            observed, numerical = load_combustion_sample(
-                real_path=real_path,
-                surrogate_path=surrogate_h5,
-                numerical_path=numerical_h5,
-                time_id=time_id,
-                horizon=horizon,
-                sub_s=sub_s,
-                is_numerical=is_numerical,
-            )
+            if is_numerical:
+                # Load from surrogate and numerical paths
+                surrogate_h5 = os.path.join(surrogate_path, sim_id)
+                numerical_h5 = os.path.join(data_path, sim_id)
+                
+                with h5py.File(surrogate_h5, "r") as f:
+                    observed = f["measured_data"][:, ::sub_s, ::sub_s]
+                with h5py.File(numerical_h5, "r") as f:
+                    numerical = f["measured_data"][:, ::sub_s, ::sub_s]
+            else:
+                # Load from real path
+                real_h5 = os.path.join(data_path, sim_id)
+                with h5py.File(real_h5, "r") as f:
+                    observed = f["trajectory"][:, ::sub_s, ::sub_s]
+                numerical = None
             
             observed = observed.astype(np.float32)
             
             record = {
                 "sim_id": sim_id,
-                "time_id": time_id,
                 "observed": observed.tobytes(),
-                "shape_t": observed.shape[0],
+                "shape_t": observed.shape[0],  # Complete trajectory length
                 "shape_h": observed.shape[1],
                 "shape_w": observed.shape[2],
             }
@@ -386,7 +320,7 @@ def combustion_generator(
             yield record
             
         except Exception as e:
-            logging.warning(f"Error loading {sim_id} at time_id={time_id}: {e}")
+            logging.warning(f"Error loading {sim_id}: {e}")
             continue
 
 
@@ -448,12 +382,10 @@ def combustion_surrogate_train_generator(
             logging.warning(f"Error loading surrogate_train {sim_id}: {e}")
             continue
 
-
 def get_fluid_features(is_numerical: bool) -> Features:
-    """Get HF Dataset features for fluid datasets."""
+    """Get HF Dataset features for fluid trajectories."""
     features = {
         "sim_id": Value("string"),
-        "time_id": Value("int32"),
         "u": Value("binary"),
         "v": Value("binary"),
         "shape_t": Value("int32"),
@@ -466,10 +398,9 @@ def get_fluid_features(is_numerical: bool) -> Features:
 
 
 def get_combustion_features(is_numerical: bool) -> Features:
-    """Get HF Dataset features for combustion datasets."""
+    """Get HF Dataset features for combustion trajectories."""
     features = {
         "sim_id": Value("string"),
-        "time_id": Value("int32"),
         "observed": Value("binary"),
         "shape_t": Value("int32"),
         "shape_h": Value("int32"),
@@ -481,144 +412,43 @@ def get_combustion_features(is_numerical: bool) -> Features:
     return Features(features)
 
 
-def get_combustion_surrogate_train_features() -> Features:
-    """Get HF Dataset features for combustion surrogate-train dataset."""
-    return Features(
-        {
-            "sim_id": Value("string"),
-            "time_id": Value("int32"),
-            "real": Value("binary"),
-            "numerical": Value("binary"),
-            "real_shape_t": Value("int32"),
-            "real_shape_h": Value("int32"),
-            "real_shape_w": Value("int32"),
-            "numerical_shape_t": Value("int32"),
-            "numerical_shape_h": Value("int32"),
-            "numerical_shape_w": Value("int32"),
-            "numerical_channels": Value("int32"),
-        }
-    )
+def generate_index_files(
+    dataset_dir: str,
+    dataset_type: str,
+    output_dir: str,
+    splits: List[str],
+) -> Dict[str, str]:
+    """Generate JSON index files from existing mapping files."""
+    sim_id_mapping, time_id_mapping = load_mapping_files(dataset_dir, dataset_type)
+    
+    output_files = {}
+    
+    for split in splits:
+        sim_ids = sim_id_mapping.get(split, [])
+        time_ids = time_id_mapping.get(split, [])
+        
+        if len(sim_ids) == 0:
+            logging.info(f"  Skipping index for {split}: no samples")
+            continue
+        
+        # Create index list
+        indices = [
+            {"sim_id": sim_id, "time_id": int(time_id)}
+            for sim_id, time_id in zip(sim_ids, time_ids)
+        ]
+        
+        # Write to JSON
+        output_path = os.path.join(output_dir, f"{split}_index_{dataset_type}.json")
+        with open(output_path, "w") as f:
+            json.dump(indices, f)
+        
+        output_files[split] = output_path
+        logging.info(f"  Index {split}: {len(indices)} entries -> {output_path}")
+    
+    return output_files
 
 
-def convert_combustion_surrogate_train_to_hf(
-    dataset_root: str,
-    output_dir: Optional[str],
-    max_shard_size: str,
-    num_proc: Optional[int],
-    step: int,
-    n_sim_frame: int,
-    sub_s_real: int,
-    sub_s_numerical: int,
-) -> Optional[str]:
-    """
-    Convert combustion surrogate-train (HDF5) to HF Arrow-sharded dataset.
-    
-    Input folders (under `{dataset_root}/combustion/`):
-    - `real_surrogate_train/`
-    - `numerical_surrogate_train/`
-    
-    Output folder:
-    - `{dataset_root}/combustion/hf_dataset/surrogate_train/`
-    
-    Also writes:
-    - `{dataset_root}/combustion/hf_dataset/surrogate_train_sim_ids.txt`
-    - `{dataset_root}/combustion/hf_dataset/surrogate_train_meta.json`
-    """
-    dataset_name = "combustion"
-    dataset_dir = os.path.join(dataset_root, dataset_name)
-    if output_dir is None:
-        output_dir = os.path.join(dataset_dir, "hf_dataset")
-    os.makedirs(output_dir, exist_ok=True)
-    
-    real_surrogate_path = os.path.join(dataset_dir, "real_surrogate_train")
-    numerical_surrogate_path = os.path.join(dataset_dir, "numerical_surrogate_train")
-    
-    if not os.path.isdir(real_surrogate_path) or not os.path.isdir(numerical_surrogate_path):
-        logging.warning(
-            "Skipping combustion surrogate_train conversion: expected folders not found:\n"
-            f"  - {real_surrogate_path}\n"
-            f"  - {numerical_surrogate_path}"
-        )
-        return None
-    
-    sim_ids = [f for f in os.listdir(numerical_surrogate_path) if f.endswith(".h5")]
-    if len(sim_ids) == 0:
-        logging.warning(
-            f"Skipping combustion surrogate_train conversion: no .h5 files in {numerical_surrogate_path}"
-        )
-        return None
-    
-    if n_sim_frame <= step:
-        raise ValueError(
-            f"Invalid surrogate_train windowing: n_sim_frame={n_sim_frame} must be > step={step}"
-        )
-    
-    time_ids = list(range(n_sim_frame - step))  # mirrors combustion_surrogate_dataset.py
-    
-    logging.info(
-        f"Converting combustion surrogate_train: {len(sim_ids)} sims × {len(time_ids)} time windows "
-        f"(step={step}, n_sim_frame={n_sim_frame})"
-    )
-    
-    # Save sim order + meta for deterministic HF indexing without depending on HDF5 folder listing.
-    sim_ids_path = os.path.join(output_dir, "surrogate_train_sim_ids.txt")
-    with open(sim_ids_path, "w") as f:
-        for sim_id in sim_ids:
-            f.write(f"{sim_id}\n")
-    
-    meta_path = os.path.join(output_dir, "surrogate_train_meta.json")
-    with open(meta_path, "w") as f:
-        json.dump(
-            {
-                "dataset_name": dataset_name,
-                "step": int(step),
-                "n_sim_frame": int(n_sim_frame),
-                "sub_s_real": int(sub_s_real),
-                "sub_s_numerical": int(sub_s_numerical),
-                "sim_ids_file": os.path.basename(sim_ids_path),
-            },
-            f,
-            indent=2,
-            sort_keys=True,
-        )
-    
-    output_path = os.path.join(output_dir, "surrogate_train")
-    if os.path.exists(output_path):
-        logging.info(f"Skipping combustion surrogate_train: output already exists at {output_path}")
-        return output_path
-    
-    def make_generator(
-        real_surrogate_path=real_surrogate_path,
-        numerical_surrogate_path=numerical_surrogate_path,
-        sim_ids=sim_ids,
-        time_ids=time_ids,
-        step=step,
-        sub_s_real=sub_s_real,
-        sub_s_numerical=sub_s_numerical,
-    ):
-        return combustion_surrogate_train_generator(
-            real_surrogate_path=real_surrogate_path,
-            numerical_surrogate_path=numerical_surrogate_path,
-            sim_ids=sim_ids,
-            time_ids=time_ids,
-            step=step,
-            sub_s_real=sub_s_real,
-            sub_s_numerical=sub_s_numerical,
-        )
-    
-    features = get_combustion_surrogate_train_features()
-    dataset = Dataset.from_generator(
-        make_generator,
-        features=features,
-        num_proc=num_proc,
-    )
-    dataset.save_to_disk(output_path, max_shard_size=max_shard_size)
-    logging.info(f"  Saved {len(dataset)} surrogate_train samples to {output_path}")
-    
-    return output_path
-
-
-def convert_fluid_to_hf(
+def convert_fluid_to_hf_v2(
     dataset_name: str,
     dataset_root: str,
     output_dir: str,
@@ -626,9 +456,8 @@ def convert_fluid_to_hf(
     dataset_types: List[str],
     splits: List[str],
     max_shard_size: str,
-    num_proc: Optional[int] = None,
-) -> Dict[Tuple[str, str], str]:
-    """Convert a fluid dataset from HDF5 to HF Dataset format."""
+) -> Dict[str, str]:
+    """Convert fluid dataset to HF format with lazy slicing."""
     dataset_dir = os.path.join(dataset_root, dataset_name)
     output_files = {}
     
@@ -637,75 +466,62 @@ def convert_fluid_to_hf(
         sub_s = config.sub_s_real if dtype == "real" else config.sub_s_numerical
         is_numerical = dtype == "numerical"
         
-        # Load mappings
+        # Load mappings to get unique sim_ids
         try:
-            sim_id_mapping, time_id_mapping = load_mapping_files(dataset_dir, dtype)
+            sim_id_mapping, _ = load_mapping_files(dataset_dir, dtype)
         except FileNotFoundError as e:
             logging.warning(f"Skipping {dataset_name}/{dtype}: {e}")
             continue
         
-        for split in splits:
-            sim_ids = list(sim_id_mapping.get(split, []))
-            time_ids = list(time_id_mapping.get(split, []))
-            
-            output_path = os.path.join(output_dir, f"{dtype}_{split}")
-            if os.path.exists(output_path):
-                logging.info(
-                    f"Skipping {dataset_name}/{dtype}/{split}: output already exists at {output_path}"
-                )
-                output_files[(dtype, split)] = output_path
-                continue
-
-            if len(sim_ids) == 0:
-                # Write an empty split for consistent on-disk structure and wrapper behavior.
-                logging.info(f"Writing EMPTY split: {dataset_name}/{dtype}/{split}")
-                features = get_fluid_features(is_numerical)
-                empty_data = {k: [] for k in features.keys()}
-                dataset = Dataset.from_dict(empty_data, features=features)
-                dataset.save_to_disk(output_path, max_shard_size=max_shard_size)
-                output_files[(dtype, split)] = output_path
-                continue
-            
-            logging.info(f"Converting {dataset_name}/{dtype}/{split}: {len(sim_ids)} samples")
-            
-            # Create generator function with closure
-            def make_generator(
-                dataset_dir=dataset_dir,
+        # Get all unique sim_ids
+        unique_sim_ids = sorted(get_unique_sim_ids(sim_id_mapping))
+        
+        if len(unique_sim_ids) == 0:
+            logging.info(f"Skipping {dataset_name}/{dtype}: no trajectories")
+            continue
+        
+        logging.info(f"Converting {dataset_name}/{dtype}: {len(unique_sim_ids)} trajectories")
+        
+        # Create generator function with closure
+        def make_generator(
+            data_path=data_path,
+            sim_ids=unique_sim_ids,
+            sub_s=sub_s,
+            is_numerical=is_numerical,
+        ):
+            return fluid_trajectory_generator(
                 data_path=data_path,
                 sim_ids=sim_ids,
-                time_ids=time_ids,
-                horizon=config.horizon,
                 sub_s=sub_s,
                 is_numerical=is_numerical,
-            ):
-                return fluid_generator(
-                    dataset_dir=dataset_dir,
-                    data_path=data_path,
-                    sim_ids=sim_ids,
-                    time_ids=time_ids,
-                    horizon=horizon,
-                    sub_s=sub_s,
-                    is_numerical=is_numerical,
-                )
-            
-            # Create HF Dataset from generator
-            features = get_fluid_features(is_numerical)
-            dataset = Dataset.from_generator(
-                make_generator,
-                features=features,
-                num_proc=num_proc,
             )
-            
-            # Save to disk with automatic sharding
-            dataset.save_to_disk(output_path, max_shard_size=max_shard_size)
-            
-            output_files[(dtype, split)] = output_path
-            logging.info(f"  Saved {len(dataset)} samples to {output_path}")
+        
+        # Create HF Dataset from generator
+        features = get_fluid_features(is_numerical)
+        dataset = Dataset.from_generator(
+            make_generator,
+            features=features,
+        )
+        
+        # Save trajectory data
+        traj_output_path = os.path.join(output_dir, dtype)
+        dataset.save_to_disk(traj_output_path, max_shard_size=max_shard_size)
+        output_files[f"{dtype}_trajectories"] = traj_output_path
+        logging.info(f"  Saved {len(dataset)} trajectories to {traj_output_path}")
+        
+        # Generate index files
+        index_files = generate_index_files(
+            dataset_dir=dataset_dir,
+            dataset_type=dtype,
+            output_dir=output_dir,
+            splits=splits,
+        )
+        output_files.update({f"{dtype}_{k}_index": v for k, v in index_files.items()})
     
     return output_files
 
 
-def convert_combustion_to_hf(
+def convert_combustion_to_hf_v2(
     dataset_name: str,
     dataset_root: str,
     output_dir: str,
@@ -713,9 +529,8 @@ def convert_combustion_to_hf(
     dataset_types: List[str],
     splits: List[str],
     max_shard_size: str,
-    num_proc: Optional[int] = None,
-) -> Dict[Tuple[str, str], str]:
-    """Convert a combustion dataset from HDF5 to HF Dataset format."""
+) -> Dict[str, str]:
+    """Convert combustion dataset to HF format with lazy slicing."""
     dataset_dir = os.path.join(dataset_root, dataset_name)
     surrogate_path = os.path.join(dataset_dir, config.surrogate_path) if config.surrogate_path else None
     output_files = {}
@@ -725,77 +540,66 @@ def convert_combustion_to_hf(
         sub_s = config.sub_s_real if dtype == "real" else config.sub_s_numerical
         is_numerical = dtype == "numerical"
         
-        # Load mappings
+        # Load mappings to get unique sim_ids
         try:
-            sim_id_mapping, time_id_mapping = load_mapping_files(dataset_dir, dtype)
+            sim_id_mapping, _ = load_mapping_files(dataset_dir, dtype)
         except FileNotFoundError as e:
             logging.warning(f"Skipping {dataset_name}/{dtype}: {e}")
             continue
         
-        for split in splits:
-            sim_ids = list(sim_id_mapping.get(split, []))
-            time_ids = list(time_id_mapping.get(split, []))
-            
-            output_path = os.path.join(output_dir, f"{dtype}_{split}")
-            if os.path.exists(output_path):
-                logging.info(
-                    f"Skipping {dataset_name}/{dtype}/{split}: output already exists at {output_path}"
-                )
-                output_files[(dtype, split)] = output_path
-                continue
-
-            if len(sim_ids) == 0:
-                # Write an empty split for consistent on-disk structure and wrapper behavior.
-                logging.info(f"Writing EMPTY split: {dataset_name}/{dtype}/{split}")
-                features = get_combustion_features(is_numerical)
-                empty_data = {k: [] for k in features.keys()}
-                dataset = Dataset.from_dict(empty_data, features=features)
-                dataset.save_to_disk(output_path, max_shard_size=max_shard_size)
-                output_files[(dtype, split)] = output_path
-                continue
-            
-            logging.info(f"Converting {dataset_name}/{dtype}/{split}: {len(sim_ids)} samples")
-            
-            # Create generator function with closure
-            def make_generator(
-                dataset_dir=dataset_dir,
+        # Get all unique sim_ids
+        unique_sim_ids = sorted(get_unique_sim_ids(sim_id_mapping))
+        
+        if len(unique_sim_ids) == 0:
+            logging.info(f"Skipping {dataset_name}/{dtype}: no trajectories")
+            continue
+        
+        logging.info(f"Converting {dataset_name}/{dtype}: {len(unique_sim_ids)} trajectories")
+        
+        # Create generator function with closure
+        def make_generator(
+            data_path=data_path,
+            surrogate_path=surrogate_path,
+            sim_ids=unique_sim_ids,
+            sub_s=sub_s,
+            is_numerical=is_numerical,
+            numerical_channel=config.numerical_channel,
+        ):
+            return combustion_trajectory_generator(
                 data_path=data_path,
                 surrogate_path=surrogate_path,
                 sim_ids=sim_ids,
-                time_ids=time_ids,
-                horizon=config.horizon,
                 sub_s=sub_s,
                 is_numerical=is_numerical,
-            ):
-                return combustion_generator(
-                    dataset_dir=dataset_dir,
-                    data_path=data_path,
-                    surrogate_path=surrogate_path,
-                    sim_ids=sim_ids,
-                    time_ids=time_ids,
-                    horizon=horizon,
-                    sub_s=sub_s,
-                    is_numerical=is_numerical,
-                )
-            
-            # Create HF Dataset from generator
-            features = get_combustion_features(is_numerical)
-            dataset = Dataset.from_generator(
-                make_generator,
-                features=features,
-                num_proc=num_proc,
+                numerical_channel=numerical_channel,
             )
-            
-            # Save to disk with automatic sharding
-            dataset.save_to_disk(output_path, max_shard_size=max_shard_size)
-            
-            output_files[(dtype, split)] = output_path
-            logging.info(f"  Saved {len(dataset)} samples to {output_path}")
+        
+        # Create HF Dataset from generator
+        features = get_combustion_features(is_numerical)
+        dataset = Dataset.from_generator(
+            make_generator,
+            features=features,
+        )
+        
+        # Save trajectory data
+        traj_output_path = os.path.join(output_dir, dtype)
+        dataset.save_to_disk(traj_output_path, max_shard_size=max_shard_size)
+        output_files[f"{dtype}_trajectories"] = traj_output_path
+        logging.info(f"  Saved {len(dataset)} trajectories to {traj_output_path}")
+        
+        # Generate index files
+        index_files = generate_index_files(
+            dataset_dir=dataset_dir,
+            dataset_type=dtype,
+            output_dir=output_dir,
+            splits=splits,
+        )
+        output_files.update({f"{dtype}_{k}_index": v for k, v in index_files.items()})
     
     return output_files
 
 
-def convert_dataset(
+def convert_dataset_v2(
     dataset_name: str,
     dataset_root: str,
     output_dir: Optional[str],
@@ -803,20 +607,19 @@ def convert_dataset(
     dataset_types: List[str],
     splits: List[str],
     max_shard_size: str,
-    num_proc: Optional[int],
-) -> Dict[Tuple[str, str], str]:
-    """Convert a dataset from HDF5 to HF Dataset format."""
+) -> Dict[str, str]:
+    """Convert a dataset from HDF5 to HF Dataset format (V2 lazy slicing)."""
     if output_dir is None:
         output_dir = os.path.join(dataset_root, dataset_name, "hf_dataset")
     
     os.makedirs(output_dir, exist_ok=True)
     
-    logging.info(f"Converting dataset: {dataset_name}")
+    logging.info(f"Converting dataset: {dataset_name} (V2 lazy slicing)")
     logging.info(f"  Output: {output_dir}")
     logging.info(f"  Max shard size: {max_shard_size}")
     
     if config.is_combustion:
-        return convert_combustion_to_hf(
+        return convert_combustion_to_hf_v2(
             dataset_name=dataset_name,
             dataset_root=dataset_root,
             output_dir=output_dir,
@@ -824,10 +627,9 @@ def convert_dataset(
             dataset_types=dataset_types,
             splits=splits,
             max_shard_size=max_shard_size,
-            num_proc=num_proc,
         )
     else:
-        return convert_fluid_to_hf(
+        return convert_fluid_to_hf_v2(
             dataset_name=dataset_name,
             dataset_root=dataset_root,
             output_dir=output_dir,
@@ -835,13 +637,12 @@ def convert_dataset(
             dataset_types=dataset_types,
             splits=splits,
             max_shard_size=max_shard_size,
-            num_proc=num_proc,
         )
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Convert HDF5 datasets to HuggingFace Dataset format"
+        description="Convert HDF5 datasets to HuggingFace Dataset format (V2 lazy slicing)"
     )
     parser.add_argument(
         "--dataset_name",
@@ -874,7 +675,7 @@ def main():
         type=str,
         nargs="+",
         default=["train", "val", "test"],
-        help="Data splits to convert",
+        help="Data splits to generate indices for",
     )
     parser.add_argument(
         "--max_shard_size",
@@ -883,21 +684,15 @@ def main():
         help="Maximum shard size (e.g., '500MB', '1GB')",
     )
     parser.add_argument(
-        "--horizon",
-        type=int,
-        default=None,
-        help="Override default horizon (in_step + out_step)",
+        "--verbose",
+        action="store_true",
+        help="Enable verbose logging",
     )
     parser.add_argument(
         "--num_proc",
         type=int,
         default=None,
-        help="Number of processes for parallel processing",
-    )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable verbose logging",
+        help="Number of processes for surrogate-train conversion",
     )
     parser.add_argument(
         "--export_test_params_json",
@@ -963,25 +758,20 @@ def main():
     
     logging.info(f"Dataset root: {args.dataset_root}")
     logging.info(f"Datasets to convert: {dataset_names}")
+    logging.info(f"Mode: V2 (lazy slicing - complete trajectories)")
     
     all_output_files = {}
     
     for name in dataset_names:
         config = DATASET_CONFIGS[name]
         
-        # Override horizon if specified
-        if args.horizon is not None:
-            config.horizon = args.horizon
-        
         # Determine output directory
         output_dir = args.output_dir
-        if output_dir is None and args.dataset_name != "all":
+        if output_dir is None:
             output_dir = os.path.join(args.dataset_root, name, "hf_dataset")
-        elif output_dir is None:
-            output_dir = None  # Will be set per-dataset
         
         try:
-            output_files = convert_dataset(
+            output_files = convert_dataset_v2(
                 dataset_name=name,
                 dataset_root=args.dataset_root,
                 output_dir=output_dir,
@@ -989,51 +779,50 @@ def main():
                 dataset_types=args.dataset_types,
                 splits=args.splits,
                 max_shard_size=args.max_shard_size,
-                num_proc=args.num_proc,
             )
-            all_output_files.update({(name, *k): v for k, v in output_files.items()})
+            all_output_files.update({(name, k): v for k, v in output_files.items()})
+
+            if args.export_test_params_json:
+                try:
+                    dataset_dir = os.path.join(args.dataset_root, name)
+                    export_test_params_pt_to_json(
+                        dataset_dir=dataset_dir,
+                        dataset_types=args.dataset_types,
+                        overwrite=args.overwrite_test_params_json,
+                    )
+                except Exception as e:
+                    logging.error(f"Error exporting test params JSON for {name}: {e}")
+                    continue
+
+            if args.include_surrogate_train and name == "combustion":
+                try:
+                    surrogate_out = convert_combustion_surrogate_train_to_hf(
+                        dataset_root=args.dataset_root,
+                        output_dir=output_dir,
+                        max_shard_size=args.max_shard_size,
+                        num_proc=args.num_proc,
+                        step=args.surrogate_step,
+                        n_sim_frame=args.surrogate_n_sim_frame,
+                        sub_s_real=args.surrogate_sub_s_real,
+                        sub_s_numerical=args.surrogate_sub_s_numerical,
+                    )
+                    if surrogate_out is not None:
+                        all_output_files[(name, "surrogate_train")] = surrogate_out
+                except Exception as e:
+                    logging.error(f"Error converting {name}/surrogate_train: {e}")
+                    continue
         except Exception as e:
             logging.error(f"Error converting {name}: {e}")
+            import traceback
+            traceback.print_exc()
             continue
-        
-        if args.export_test_params_json:
-            try:
-                dataset_dir = os.path.join(args.dataset_root, name)
-                export_test_params_pt_to_json(
-                    dataset_dir=dataset_dir,
-                    dataset_types=args.dataset_types,
-                    overwrite=args.overwrite_test_params_json,
-                )
-            except Exception as e:
-                logging.error(f"Error exporting test params JSON for {name}: {e}")
-                continue
-        
-        # Optional: combustion surrogate-train conversion
-        if args.include_surrogate_train and name == "combustion":
-            try:
-                surrogate_out = convert_combustion_surrogate_train_to_hf(
-                    dataset_root=args.dataset_root,
-                    output_dir=output_dir,
-                    max_shard_size=args.max_shard_size,
-                    num_proc=args.num_proc,
-                    step=args.surrogate_step,
-                    n_sim_frame=args.surrogate_n_sim_frame,
-                    sub_s_real=args.surrogate_sub_s_real,
-                    sub_s_numerical=args.surrogate_sub_s_numerical,
-                )
-                if surrogate_out is not None:
-                    all_output_files[(name, "surrogate_train")] = surrogate_out
-            except Exception as e:
-                logging.error(f"Error converting {name}/surrogate_train: {e}")
-                continue
     
     logging.info("=" * 60)
     logging.info("Conversion complete!")
-    logging.info("Output directories:")
+    logging.info("Output files:")
     for key, path in all_output_files.items():
         logging.info(f"  {key}: {path}")
 
 
 if __name__ == "__main__":
     main()
-

@@ -44,7 +44,7 @@ This repo is packaged with `pyproject.toml` and can be installed via pip (requir
 
 ```bash
 git clone https://github.com/AI4Science-WestlakeU/RealPDEBench.git
-cd ReaLPDEBench
+cd RealPDEBench
 pip install -e .
 ```
 
@@ -67,10 +67,12 @@ We provide a small pattern-based downloader:
 realpdebench download --dataset-root /path/to/data --scenario fsi --what metadata
 
 # to download Arrow shards (LARGE), explicitly set --what=hf_dataset or --what=all
-realpdebench download --dataset-root /path/to/data --scenario fsi --what hf_dataset --dataset-type real --split train
+# splits are stored in index JSONs under hf_dataset/ (no split directories)
+realpdebench download --dataset-root /path/to/data --scenario fsi --what hf_dataset --dataset-type real
 ```
 
 Tips:
+- Behind GFW, set `--endpoint https://hf-mirror.com` (or env `HF_ENDPOINT`).
 - If you hit rate limits (HTTP 429) or need auth, login and set env `HF_TOKEN=...`.
 - We recommend setting env `HF_HUB_DISABLE_XET=1`.
 
@@ -101,9 +103,10 @@ python -m realpdebench.train --config configs/cylinder/fno.yaml --train_data_typ
 
 ### Using HF Arrow-backed datasets
 
-If you have HF Arrow datasets under `{dataset_root}/{scenario}/hf_dataset/...`, enable:
-- `--use_hf_dataset`: use `datasets.load_from_disk` Arrow shards
-- `--hf_auto_download`: download missing artifacts from HF automatically
+HF Arrow datasets are stored under `{dataset_root}/{scenario}/hf_dataset/{real,numerical}/` with split index files
+`{split}_index_{type}.json`. To use them, enable:
+- `--use_hf_dataset`: load Arrow trajectories + index files (lazy slicing, dynamic `N_autoregressive`)
+- `--hf_auto_download`: download missing artifacts from HF automatically (use `--hf_endpoint https://hf-mirror.com` behind GFW)
 
 Example:
 
