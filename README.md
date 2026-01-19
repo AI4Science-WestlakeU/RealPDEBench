@@ -72,7 +72,7 @@ realpdebench download --dataset-root /path/to/data --scenario fsi --what hf_data
 ```
 
 Tips:
-- Behind GFW, set `--endpoint https://hf-mirror.com` (or env `HF_ENDPOINT`).
+- Set `--endpoint https://hf-mirror.com` (or env `HF_ENDPOINT`) to get acesss.
 - If you hit rate limits (HTTP 429) or need auth, login and set env `HF_TOKEN=...`.
 - We recommend setting env `HF_HUB_DISABLE_XET=1`.
 
@@ -106,7 +106,7 @@ python -m realpdebench.train --config configs/cylinder/fno.yaml --train_data_typ
 HF Arrow datasets are stored under `{dataset_root}/{scenario}/hf_dataset/{real,numerical}/` with split index files
 `{split}_index_{type}.json`. To use them, enable:
 - `--use_hf_dataset`: load Arrow trajectories + index files (lazy slicing, dynamic `N_autoregressive`)
-- `--hf_auto_download`: download missing artifacts from HF automatically (use `--hf_endpoint https://hf-mirror.com` behind GFW)
+- `--hf_auto_download`: download missing artifacts from HF automatically (use `--hf_endpoint https://hf-mirror.com` for easy accessing)
 
 Example:
 
