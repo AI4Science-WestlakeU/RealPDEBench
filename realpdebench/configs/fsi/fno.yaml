@@ -5,7 +5,7 @@ results_path: "./results/"
 
 # data
 dataset_name: "fsi"
-dataset_root: /hupeiyan/RealPDEBench/data
+dataset_root: "/wutailin/real_benchmark/"
 num_workers: 12
 normalizer: "gaussian" # none, gaussian, range
 
@@ -15,7 +15,7 @@ noise_scale: 0.1 # only applicable for numerical data
 
 # model
 model_name: "fno"
-checkpoint_path: /ssdwork/results/fno/fno_double_cylinder_numerical_False/2025-08-18_13-06-26/model_2300.pth
+checkpoint_path: /ssdwork/results/fno/fno_fsi_numerical_False/2025-08-18_13-06-26/model_2300.pth
 modes1: 4
 modes2: 16
 modes3: 16
@@ -33,5 +33,5 @@ lr: 0.01
 clip_grad_norm: 0.
 
 # evaluation
-N_autoregressive: 2
+N_autoregressive: 10
 N_plot: 0

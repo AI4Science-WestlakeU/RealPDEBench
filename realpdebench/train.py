@@ -313,7 +313,9 @@ if __name__ == "__main__":
     all_val_losses = {
         'normalized_mse': [], 'rmse': [], 'mae': [], 'rel_l2_error': [], 
         'r2': [], 'ke_error': [], 'f_error': [], 'low_f_error': [],
-        'mid_f_error': [], 'high_f_error': [], 'freq_error': [],
+        'mid_f_error': [], 'high_f_error': [], 
+        'rel_low_f_error': [], 'rel_mid_f_error': [], 'rel_high_f_error': [],
+        'freq_error': [],
     }
 
     for iteration in pbar:
