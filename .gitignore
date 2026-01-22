@@ -1,4 +1,7 @@
-realpdebench/results
+realpdebench/results/
+data/
+results/
+
 
 __pycache__/
 *.pyc
