@@ -64,11 +64,11 @@ We provide a small pattern-based downloader:
 
 ```bash
 # safe default: download metadata JSONs only
-realpdebench download --dataset-root /path/to/data --scenario fsi --what metadata
+realpdebench download --dataset-root /path/to/data --scenario cylinder --what metadata
 
 # to download Arrow shards (LARGE), explicitly set --what=hf_dataset or --what=all
 # splits are stored in index JSONs under hf_dataset/ (no split directories)
-realpdebench download --dataset-root /path/to/data --scenario fsi --what hf_dataset --dataset-type real
+realpdebench download --dataset-root /path/to/data --scenario cylinder --what hf_dataset --dataset-type real
 ```
 
 Tips:
@@ -111,7 +111,7 @@ HF Arrow datasets are stored under `{dataset_root}/{scenario}/hf_dataset/{real,n
 Example:
 
 ```bash
-python -m realpdebench.train --config configs/fsi/fno.yaml --use_hf_dataset --hf_auto_download --hf_endpoint https://hf-mirror.com
+python -m realpdebench.train --config configs/cylinder/fno.yaml --use_hf_dataset --hf_auto_download --hf_endpoint https://hf-mirror.com
 ```
 
 ------
@@ -119,7 +119,7 @@ python -m realpdebench.train --config configs/fsi/fno.yaml --use_hf_dataset --hf
 ## 📤 Inference
 
 ```bash
-python -m realpdebench.eval --config configs/fsi/fno.yaml --checkpoint_path /path/to/checkpoint.pth
+python -m realpdebench.eval --config configs/cylinder/fno.yaml --checkpoint_path /path/to/checkpoint.pth
 ```
 
 ------
