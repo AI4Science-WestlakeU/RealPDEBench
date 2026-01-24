@@ -113,7 +113,7 @@ class FluidHFDataset(RealDataset):
         self.n_sim_frame = n_sim_frame
         self.trunk_length = trunk_length
         
-        # Spatial subsampling (NOTE: already applied during Arrow conversion)
+        # Spatial subsampling (applied at runtime, stored at full resolution)
         self.sub_s_real = sub_s_real
         self.sub_s_numerical = sub_s_numerical
         self.sub_s = sub_s_real if dataset_type == "real" else sub_s_numerical
@@ -274,15 +274,18 @@ class FluidHFDataset(RealDataset):
         traj_idx = self._sim_id_to_idx[sim_id]
         row = self.trajectories[traj_idx]
         
-        # Decode complete trajectory
+        # Decode complete trajectory (stored at full resolution)
         full_shape = (row["shape_t"], row["shape_h"], row["shape_w"])
         u_full = self._decode_array(row["u"], full_shape)
         v_full = self._decode_array(row["v"], full_shape)
-        
-        # DYNAMIC slicing: take [time_id : time_id + horizon]
-        u = u_full[time_id : time_id + self.horizon]
-        v = v_full[time_id : time_id + self.horizon]
-        
+
+        # DYNAMIC slicing + RUNTIME SUBSAMPLING
+        # Time slicing: [time_id : time_id + horizon]
+        # Spatial subsampling: [::sub_s, ::sub_s] (same as H5 loader)
+        sub_s = self.sub_s
+        u = u_full[time_id : time_id + self.horizon, ::sub_s, ::sub_s]
+        v = v_full[time_id : time_id + self.horizon, ::sub_s, ::sub_s]
+
         # Handle pressure channel
         if self.dataset_type == "real":
             # Real data: p is zeros
@@ -293,7 +296,7 @@ class FluidHFDataset(RealDataset):
                 p = np.zeros_like(u)
             else:
                 p_full = self._decode_array(row["p"], full_shape)
-                p = p_full[time_id : time_id + self.horizon]
+                p = p_full[time_id : time_id + self.horizon, ::sub_s, ::sub_s]
         
         # Stack channels: (T, H, W, 3)
         data = np.stack([u, v, p], axis=-1)

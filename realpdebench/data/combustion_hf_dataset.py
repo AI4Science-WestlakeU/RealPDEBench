@@ -104,7 +104,7 @@ class CombustionHFDataset(RealDataset):
         self.n_sim_frame = n_sim_frame
         self.trunk_length = trunk_length
         
-        # Spatial subsampling (NOTE: already applied during Arrow conversion)
+        # Spatial subsampling (applied at runtime, stored at full resolution)
         self.sub_s_real = sub_s_real
         self.sub_s_numerical = sub_s_numerical
         self.sub_s = sub_s_real if dataset_type == "real" else sub_s_numerical
@@ -272,19 +272,20 @@ class CombustionHFDataset(RealDataset):
         traj_idx = self._sim_id_to_idx[sim_id]
         row = self.trajectories[traj_idx]
         
-        # Get full trajectory shape
+        # Get full trajectory shape (stored at full resolution)
         full_shape = (row["shape_t"], row["shape_h"], row["shape_w"])
-        
+        sub_s = self.sub_s
+
         if self.dataset_type == "real":
             # Real data: load observed, append zeros for numerical channels
             observed_full = self._decode_array(row["observed"], full_shape)
-            
-            # Dynamic slicing
-            observed = observed_full[time_id : time_id + self.horizon]
-            
+
+            # Dynamic slicing + runtime subsampling
+            observed = observed_full[time_id : time_id + self.horizon, ::sub_s, ::sub_s]
+
             # Add channel dimension
             data = torch.tensor(observed, dtype=torch.float32).unsqueeze(-1)
-            
+
             # Append zeros for unobserved channels
             unobserved = torch.zeros(
                 data.shape[0], data.shape[1], data.shape[2], self.numerical_channel
@@ -293,11 +294,11 @@ class CombustionHFDataset(RealDataset):
         else:
             # Numerical data: load observed (surrogate) + numerical channels
             observed_full = self._decode_array(row["observed"], full_shape)
-            
-            # Dynamic slicing for observed
-            observed = observed_full[time_id : time_id + self.horizon]
+
+            # Dynamic slicing + runtime subsampling for observed
+            observed = observed_full[time_id : time_id + self.horizon, ::sub_s, ::sub_s]
             surrogate_data = torch.tensor(observed, dtype=torch.float32).unsqueeze(-1)
-            
+
             # Apply mask_prob: randomly decide whether to use zeros or actual numerical data
             if random.random() < self.mask_prob:
                 numerical = torch.zeros(
@@ -305,15 +306,15 @@ class CombustionHFDataset(RealDataset):
                     surrogate_data.shape[2], self.numerical_channel
                 )
             else:
-                # Load and slice actual numerical data
+                # Load and slice actual numerical data with subsampling
                 num_channels = row["numerical_channels"]
                 numerical_full = self._decode_array(
                     row["numerical"],
                     (*full_shape, num_channels)
                 )
-                numerical = numerical_full[time_id : time_id + self.horizon]
+                numerical = numerical_full[time_id : time_id + self.horizon, ::sub_s, ::sub_s]
                 numerical = torch.tensor(numerical, dtype=torch.float32)
-            
+
             data = torch.cat([surrogate_data, numerical], dim=-1)
         
         # Split into input/output (same logic as H5)
