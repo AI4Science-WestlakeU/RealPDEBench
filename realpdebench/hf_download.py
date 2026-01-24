@@ -29,8 +29,29 @@ def _check_version_before_download(
     """
     Download version.json first and check compatibility BEFORE downloading large files.
 
-    Raises RuntimeError if code version is incompatible with data version.
-    This prevents wasting bandwidth on incompatible data.
+    This function fetches the small version.json (~1KB) from HF Hub and checks
+    if the current code version meets the minimum required version. If not,
+    it raises RuntimeError to prevent wasting bandwidth on incompatible data.
+
+    Version Semantics:
+        - data_version: Tracks data content changes (e.g., new trajectories, fixes).
+          Incremented for any data update, but does NOT force code upgrades.
+        - min_code_version: Minimum code version required to use this data.
+          Only incremented for BREAKING changes (format changes, API changes).
+
+    Examples:
+        - Adding 6 fsi trajectories: data_version 2.0.0 -> 2.0.1, min_code_version unchanged
+        - Fixing data errors: data_version 2.0.1 -> 2.0.2, min_code_version unchanged
+        - Format change (V2 -> V3): data_version 3.0.0, min_code_version 0.2.0 -> 0.3.0
+
+    Args:
+        repo_id: HF Hub repository ID (e.g., "AI4Science-WestlakeU/RealPDEBench").
+        endpoint: Optional HF Hub endpoint (e.g., "https://hf-mirror.com" for China).
+        revision: Optional git revision (branch, tag, or commit hash).
+        token: Optional HF Hub token for authentication.
+
+    Raises:
+        RuntimeError: If code version < min_code_version (breaking incompatibility).
     """
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
