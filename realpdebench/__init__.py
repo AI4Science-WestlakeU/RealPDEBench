@@ -45,8 +45,11 @@ def check_data_version(dataset_root: str) -> None:
                 f"  Requires code >= {min_code}\n"
                 f"  Your code version: {__version__}\n"
                 f"\n"
-                f"  Please upgrade: {info.get('upgrade_instructions', 'pip install -U realpdebench')}\n"
-                f"  Details: {info.get('repo_url', '')}\n"
+                f"  Please upgrade:\n"
+                f"    cd <your-realpdebench-repo>\n"
+                f"    git pull && pip install -e .\n"
+                f"\n"
+                f"  Repo: {info.get('repo_url', '')}\n"
                 f"{'='*60}\n"
             )
     except (ValueError, TypeError):

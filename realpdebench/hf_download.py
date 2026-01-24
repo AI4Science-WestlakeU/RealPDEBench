@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
+import logging
 import os
+import tempfile
 from pathlib import Path
 from typing import Iterable, Literal, Sequence
 
@@ -8,11 +11,80 @@ import requests
 from huggingface_hub import snapshot_download
 from huggingface_hub.errors import HfHubHTTPError, LocalEntryNotFoundError
 
+from realpdebench import __version__
+
 Scenario = Literal["cylinder", "controlled_cylinder", "fsi", "foil", "combustion"]
 DatasetType = Literal["real", "numerical"]
 Split = Literal["train", "val", "test"]
 
 DEFAULT_HF_DATASET_REPO_ID = "AI4Science-WestlakeU/RealPDEBench"
+
+
+def _check_version_before_download(
+    repo_id: str,
+    endpoint: str | None,
+    revision: str | None,
+    token: str | None,
+) -> None:
+    """
+    Download version.json first and check compatibility BEFORE downloading large files.
+
+    Raises RuntimeError if code version is incompatible with data version.
+    This prevents wasting bandwidth on incompatible data.
+    """
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            snapshot_download(
+                repo_id=repo_id,
+                repo_type="dataset",
+                allow_patterns=["version.json"],
+                local_dir=tmpdir,
+                endpoint=endpoint,
+                revision=revision,
+                token=token,
+            )
+        except Exception as e:
+            # version.json doesn't exist or network error, skip check
+            logging.debug(f"Could not fetch version.json for pre-check: {e}")
+            return
+
+        version_file = Path(tmpdir) / "version.json"
+        if not version_file.exists():
+            return
+
+        try:
+            with open(version_file, "r") as f:
+                info = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return
+
+        min_code = info.get("min_code_version", "0.0.0")
+        data_version = info.get("data_version", "unknown")
+
+        def parse_version(v: str) -> tuple:
+            return tuple(int(x) for x in v.split(".")[:3])
+
+        try:
+            if parse_version(__version__) < parse_version(min_code):
+                raise RuntimeError(
+                    f"\n{'='*60}\n"
+                    f"DATA VERSION INCOMPATIBLE - DOWNLOAD ABORTED\n"
+                    f"{'='*60}\n"
+                    f"  HF data version: {data_version}\n"
+                    f"  Requires code >= {min_code}\n"
+                    f"  Your code version: {__version__}\n"
+                    f"\n"
+                    f"  Please upgrade first:\n"
+                    f"    cd <your-realpdebench-repo>\n"
+                    f"    git pull && pip install -e .\n"
+                    f"\n"
+                    f"  Repo: {info.get('repo_url', '')}\n"
+                    f"{'='*60}\n"
+                )
+        except (ValueError, TypeError):
+            pass  # Invalid version format, skip
+
+
 ALL_SCENARIOS: tuple[Scenario, ...] = (
     "cylinder",
     "controlled_cylinder",
@@ -68,8 +140,9 @@ def build_allow_patterns(
         splits = ("train", "val", "test")
 
     patterns: list[str] = []
-    # Always allow downloading the dataset card (small, helpful).
+    # Always allow downloading metadata files (small, helpful).
     patterns.append("README.md")
+    patterns.append("version.json")
 
     for scenario in scenarios:
         if what in {"metadata", "all"}:
@@ -152,6 +225,14 @@ def download_realpdebench(
 
     # If the caller didn't pass endpoint explicitly, allow env-based override.
     endpoint = endpoint or os.environ.get("HF_ENDPOINT")
+
+    # Check version compatibility BEFORE downloading large files
+    _check_version_before_download(
+        repo_id=repo_id,
+        endpoint=endpoint,
+        revision=revision,
+        token=token,
+    )
 
     try:
         snapshot_path = snapshot_download(
