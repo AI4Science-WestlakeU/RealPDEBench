@@ -83,7 +83,11 @@ class CombustionHFDataset(RealDataset):
     ):
         # Skip RealDataset.__init__() - we don't need HDF5 file counting
         Dataset.__init__(self)
-        
+
+        # Check data version compatibility
+        from realpdebench import check_data_version
+        check_data_version(dataset_root)
+
         # Store dataset identification
         self.dataset_name = dataset_name
         self.dataset_root = dataset_root
