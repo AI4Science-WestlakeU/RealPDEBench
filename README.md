@@ -6,6 +6,7 @@
 # RealPDEBench: A Benchmark for Complex Physical Systems with Paired Real-World and Simulated Data
 
 [![HF Dataset](https://img.shields.io/badge/HF%20Dataset-RealPDEBench-FFD21E?logo=huggingface)](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench)
+[![HF Models](https://img.shields.io/badge/HF%20Models-RealPDEBench--models-FFD21E?logo=huggingface)](https://huggingface.co/AI4Science-WestlakeU/RealPDEBench-models)
 [![arXiv](https://img.shields.io/badge/arXiv-2601.01829-b31b1b?logo=arxiv)](https://arxiv.org/abs/2601.01829)
 [![Website & Docs](https://img.shields.io/badge/Website%20%26%20Docs-realpdebench.github.io-1f6feb?logo=google-chrome)](https://realpdebench.github.io/)
 [![Codebase](https://img.shields.io/badge/Codebase-GitHub-181717?logo=github)](https://github.com/AI4Science-WestlakeU/RealPDEBench)
@@ -82,9 +83,34 @@ Coming soon!
 
 ------
 
-## 📝 Checkpoint & log file download
+## 📝 Checkpoint download
 
-Coming soon!
+[![HF Models](https://img.shields.io/badge/HF%20Models-RealPDEBench--models-FFD21E?logo=huggingface)](https://huggingface.co/AI4Science-WestlakeU/RealPDEBench-models)
+
+We release trained checkpoints for all 10 models × 5 scenarios × 3 training paradigms (numerical / real / finetune) on [HuggingFace](https://huggingface.co/AI4Science-WestlakeU/RealPDEBench-models).
+
+```python
+from huggingface_hub import hf_hub_download
+
+# Download a single checkpoint
+path = hf_hub_download(
+    repo_id="AI4Science-WestlakeU/RealPDEBench-models",
+    filename="cylinder/fno/finetune.pth",
+)
+```
+
+```python
+from huggingface_hub import snapshot_download
+
+# Download all checkpoints for a scenario
+snapshot_download(
+    repo_id="AI4Science-WestlakeU/RealPDEBench-models",
+    allow_patterns="cylinder/**",
+    local_dir="./checkpoints",
+)
+```
+
+DPOT models require pretrained backbone weights (not included). Download via `python -m realpdebench.utils.dpot_ckpts_dl` or from [hzk17/DPOT](https://huggingface.co/hzk17/DPOT).
 
 ------
 
