@@ -178,16 +178,17 @@ We welcome contributions from the community! Please feel free to
 If you find our work and/or our code useful, please cite us via:
 
 ```bibtex
-@misc{hu2026realpdebenchbenchmarkcomplexphysical,
+@inproceedings{hu2026realpdebench,
       title={RealPDEBench: A Benchmark for Complex Physical Systems with Real-World Data}, 
       author={Peiyan Hu and Haodong Feng and Hongyuan Liu and Tongtong Yan and Wenhao Deng and Tianrun Gao and Rong Zheng and Haoren Zheng and Chenglei Yu and Chuanrui Wang and Kaiwen Li and Zhi-Ming Ma and Dezhi Zhou and Xingcai Lu and Dixia Fan and Tailin Wu},
+      booktitle={The Fourteenth International Conference on Learning Representations},
       year={2026},
-      eprint={2601.01829},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2601.01829}, 
+      url={https://openreview.net/forum?id=y3oHMcoItR},
+      note={Oral Presentation}
 }
 ```
+
+
 
 ------
 
