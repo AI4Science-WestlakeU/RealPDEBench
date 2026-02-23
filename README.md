@@ -77,10 +77,6 @@ Tips:
 - If you hit rate limits (HTTP 429) or need auth, login and set env `HF_TOKEN=...`.
 - We recommend setting env `HF_HUB_DISABLE_XET=1`.
 
-### HDF5-format dataset
-
-Coming soon!
-
 ------
 
 ## 📝 Checkpoint download
