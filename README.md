@@ -3,7 +3,7 @@
   <img src="imgs/logo.png" alt="RealPDEBench logo" width="700" />
 </p>
 
-# [ICLR26b Oral] RealPDEBench: A Benchmark for Complex Physical Systems with Paired Real-World and Simulated Data
+# [ICLR26 Oral] RealPDEBench: A Benchmark for Complex Physical Systems with Paired Real-World and Simulated Data
 
 [![HF Dataset](https://img.shields.io/badge/HF%20Dataset-RealPDEBench-FFD21E?logo=huggingface)](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench)
 [![HF Models](https://img.shields.io/badge/HF%20Models-RealPDEBench--models-FFD21E?logo=huggingface)](https://huggingface.co/AI4Science-WestlakeU/RealPDEBench-models)
