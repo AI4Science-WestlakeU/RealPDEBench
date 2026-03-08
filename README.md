@@ -167,6 +167,51 @@ We welcome contributions from the community! Please feel free to
 
 ------
 
+## ❓ FAQ
+
+<details>
+<summary><b>Why do the number of <code>.arrow</code> files differ from the trajectory count?</b></summary>
+
+Arrow format packs multiple rows into one shard up to a size limit (~500 MB), but never splits a single row across shards. Real trajectories are smaller (fewer channels, ~130–260 MB each), so 2–4 are packed per shard; numerical trajectories are larger (extra channels such as pressure or 15 simulated fields, ~1.5–2.1 GB each), so each one already exceeds the shard limit, resulting in a 1:1 mapping.
+
+| Scenario | Trajectories (real / numerical) | Arrow shards (real / numerical) |
+|---|---:|---:|
+| cylinder | 92 / 92 | 73 / 92 |
+| controlled_cylinder | 96 / 96 | 51 / 96 |
+| fsi | 51 / 51 | 51 / 51 |
+| foil | 98 / 99 | 98 / 99 |
+| combustion | 30 / 30 | 8 / 30 |
+
+</details>
+
+<details>
+<summary><b>What do <code>remain_params</code>, <code>in_dist_test_params</code>, and <code>out_dist_test_params</code> mean?</b></summary>
+
+These JSON files partition trajectories by physical parameter regime. The three groups sum to the total trajectory count for each scenario:
+
+- **`in_dist_test_params`**: trajectories with in-distribution parameters, **entirely** reserved for testing.
+- **`out_dist_test_params`**: trajectories with out-of-distribution (edge/extreme) parameters, **entirely** reserved for testing.
+- **`remain_params`**: all other trajectories — **part** of each trajectory's time axis is used for training, the rest for validation/testing.
+
+At evaluation time, `test_mode` can be set to `"seen"` (remain), `"in_dist"`, `"out_dist"`, `"unseen"` (in\_dist + out\_dist), or `"all"`.
+
+| Scenario | Type | remain | in\_dist\_test | out\_dist\_test | Total |
+|---|---|---:|---:|---:|---:|
+| cylinder | real | 72 | 10 | 10 | 92 |
+| cylinder | numerical | 92 | 0 | 0 | 92 |
+| controlled\_cylinder | real | 76 | 10 | 10 | 96 |
+| controlled\_cylinder | numerical | 96 | 0 | 0 | 96 |
+| fsi | real | 39 | 0 | 12 | 51 |
+| fsi | numerical | 51 | 0 | 0 | 51 |
+| foil | real | 78 | 10 | 10 | 98 |
+| foil | numerical | 99 | 0 | 0 | 99 |
+| combustion | real | 30 | 0 | 0 | 30 |
+| combustion | numerical | 30 | 0 | 0 | 30 |
+
+</details>
+
+------
+
 ## 🫡 Citation
 
 If you find our work and/or our code useful, please cite us via:
