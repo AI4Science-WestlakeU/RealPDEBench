@@ -213,7 +213,7 @@ At evaluation time, `test_mode` can be set to `"seen"` (remain), `"in_dist"`, `"
 <details>
 <summary><b>Where are the field / channel names for each scenario documented?</b></summary>
 
-Each scenario folder on the [HF dataset](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench) ships a machine-readable `{scenario}/channels.json` describing every field (Arrow column) with its shape and a short physical description. Authoritative units and physical definitions live on the [dataset documentation pages](https://realpdebench.github.io/datasets/).
+Each scenario folder on the [HF dataset](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench) ships a machine-readable `{scenario}/channels.json` listing every field (Arrow column) with its shape.
 
 | Scenario | Real fields | Numerical fields |
 |---|---|---|
@@ -221,7 +221,7 @@ Each scenario folder on the [HF dataset](https://huggingface.co/datasets/AI4Scie
 | controlled_cylinder | `u`, `v` | `u`, `v`, `p` |
 | fsi | `u`, `v` | `u`, `v`, `p` |
 | foil | `u`, `v` | `u`, `v`, `p` |
-| combustion | `observed` | `observed` + `numerical` *(packed 15 channels — see below)* |
+| combustion | `observed` | `observed` + `numerical` *(packed 15 channels, see below)* |
 
 For combustion, the `numerical` column has shape `(T, H, W, 15)`; the 15 channels along the last axis are, in order:
 
@@ -236,7 +236,7 @@ For combustion, the `numerical` column has shape `(T, H, W, 15)`; the 15 channel
 | 6 | `Mole_Fraction_of_NH2` | 14 | `Velocity_Magnitude` |
 | 7 | `Mole_Fraction_of_NH3` | | |
 
-See [`combustion/channels.json`](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench/blob/main/combustion/channels.json) for the same list with physical descriptions.
+A machine-readable copy of the same list lives in [`combustion/channels.json`](https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench/blob/main/combustion/channels.json).
 
 </details>
 
