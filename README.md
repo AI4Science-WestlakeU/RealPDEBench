@@ -80,7 +80,9 @@ Tips:
 
 ### HDF5-format dataset
 
-Coming soon!
+> **Note:** The Hugging Face dataset above is still the recommended way to download data (faster, and integrates with the `realpdebench` loaders). The raw HDF5 distribution below is provided for completeness, e.g., if you want to inspect the original simulation outputs or use them outside the RealPDEBench codebase.
+
+Raw HDF5 trajectories are hosted on the Westlake data distribution server: <https://realpdebench.westlake.edu.cn/>
 
 ------
 
