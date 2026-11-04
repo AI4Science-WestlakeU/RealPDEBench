@@ -276,7 +276,3 @@ If you find our work and/or our code useful, please cite us via:
 - NeurIPS 2026 RealPDE Competition: https://realpdecompetition.github.io
 - REALM: https://github.com/deepflame-ai/REALM/tree/main
 - PDEBench: https://github.com/pdebench/PDEBench
-
-### Transolver-sigma
-
-See [Transolver-sigma](docs/transolver_sigma.md) for architecture, five scenario configurations, and training/evaluation commands.
