@@ -1,17 +1,10 @@
-"""Transolver-sigma for structured spatiotemporal fields.
-
-A spatiotemporal stage combines axis-factorized spectral convolutions with
-framewise physics attention. Temporal attention pooling feeds a spatial stage
-that predicts the complete next time window. Parameter names are retained for
-compatibility with the original trained checkpoints.
-"""
 from __future__ import annotations
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
-from timm.models.layers import trunc_normal_
+from timm.layers import trunc_normal_
 
 from realpdebench.model.model import Model as BaseModel
 
@@ -20,6 +13,7 @@ _ACTIVATION = {
     'gelu': nn.GELU, 'tanh': nn.Tanh, 'sigmoid': nn.Sigmoid,
     'relu': nn.ReLU, 'silu': nn.SiLU,
 }
+
 
 def _act(name):
     cls = _ACTIVATION[name]
@@ -52,7 +46,7 @@ class SwiGLU(nn.Module):
     def __init__(self, dim_in, dim_hid, dim_out):
         super().__init__()
         self.w_gate = nn.Linear(dim_in, dim_hid)
-        self.w_up   = nn.Linear(dim_in, dim_hid)
+        self.w_up = nn.Linear(dim_in, dim_hid)
         self.w_down = nn.Linear(dim_hid, dim_out)
 
     def forward(self, x):
@@ -66,11 +60,11 @@ class TemporalAggregator(nn.Module):
         super().__init__()
         self.scale = dim ** -0.5
         self.query_proj = nn.Linear(dim, dim)
-        self.key_proj   = nn.Linear(dim, dim)
+        self.key_proj = nn.Linear(dim, dim)
 
     def forward(self, x):  # (B, N, T, C)
-        q = self.query_proj(x.mean(dim=2))           # (B, N, C)
-        k = self.key_proj(x)                          # (B, N, T, C)
+        q = self.query_proj(x.mean(dim=2))  # (B, N, C)
+        k = self.key_proj(x)  # (B, N, T, C)
         attn = torch.einsum('bnc,bntc->bnt', q, k) * self.scale
         attn = torch.softmax(attn, dim=-1)
         return torch.einsum('bnt,bntc->bnc', attn, x)
@@ -83,10 +77,10 @@ class PhysicsAttention2D(nn.Module):
         super().__init__()
         inner_dim = dim_head * heads
         self.dim_head = dim_head
-        self.heads    = heads
-        self.scale    = dim_head ** -0.5
-        self.softmax  = nn.Softmax(dim=-1)
-        self.dropout  = nn.Dropout(dropout)
+        self.heads = heads
+        self.scale = dim_head ** -0.5
+        self.softmax = nn.Softmax(dim=-1)
+        self.dropout = nn.Dropout(dropout)
         self.temperature = nn.Parameter(torch.ones(1, heads, 1, 1) * 0.5)
         self.H, self.W = H, W
 
@@ -96,16 +90,16 @@ class PhysicsAttention2D(nn.Module):
                 nn.Conv2d(in_ch, out_ch, 1),
             )
 
-        self.in_project_x     = _dwsep2d(dim, inner_dim)
-        self.in_project_fx    = _dwsep2d(dim, inner_dim)
+        self.in_project_x = _dwsep2d(dim, inner_dim)
+        self.in_project_fx = _dwsep2d(dim, inner_dim)
         self.in_project_slice = nn.Linear(dim_head, slice_num)
         nn.init.orthogonal_(self.in_project_slice.weight)
 
-        self.to_q   = nn.Linear(dim_head, dim_head, bias=False)
-        self.to_k   = nn.Linear(dim_head, dim_head, bias=False)
-        self.to_v   = nn.Linear(dim_head, dim_head, bias=False)
+        self.to_q = nn.Linear(dim_head, dim_head, bias=False)
+        self.to_k = nn.Linear(dim_head, dim_head, bias=False)
+        self.to_v = nn.Linear(dim_head, dim_head, bias=False)
         self.to_out = nn.Sequential(nn.Linear(inner_dim, dim), nn.Dropout(dropout))
-        self.gamma  = nn.Parameter(torch.zeros(1))
+        self.gamma = nn.Parameter(torch.zeros(1))
 
     def _project(self, proj, x, B_eff, N):
         H, W = self.H, self.W
@@ -118,10 +112,10 @@ class PhysicsAttention2D(nn.Module):
     def forward(self, x):
         B_eff, N, C = x.shape
         fx_mid = self._project(self.in_project_fx, x, B_eff, N)
-        x_mid  = self._project(self.in_project_x,  x, B_eff, N)
+        x_mid = self._project(self.in_project_x,  x, B_eff, N)
         slice_weights = self.softmax(
             self.in_project_slice(x_mid) / torch.clamp(self.temperature, 0.1, 5))
-        slice_norm  = slice_weights.sum(2)
+        slice_norm = slice_weights.sum(2)
         slice_token = torch.einsum('bhnc,bhng->bhgc', fx_mid, slice_weights)
         slice_token = slice_token / ((slice_norm + 1e-5).unsqueeze(-1))
         q = self.to_q(slice_token)
@@ -141,7 +135,7 @@ class _AxisSpectralConv3D(nn.Module):
         super().__init__()
         assert axis in ('D', 'H', 'W')
         self.modes = modes
-        self.axis  = axis
+        self.axis = axis
         scale = 1.0 / (dim * dim)
         self.weights = nn.Parameter(scale * torch.randn(dim, dim, modes, 2))
 
@@ -150,27 +144,27 @@ class _AxisSpectralConv3D(nn.Module):
         w_c = torch.view_as_complex(self.weights.contiguous())
         if self.axis == 'D':
             xp = x.permute(0, 4, 2, 3, 1).contiguous()
-            n  = D
+            n = D
             xft = torch.fft.rfft(xp, norm='ortho')
-            fm  = min(self.modes, n // 2 + 1)
+            fm = min(self.modes, n // 2 + 1)
             out_ft = torch.zeros(B, C, H, W, n // 2 + 1, dtype=torch.cfloat, device=x.device)
             out_ft[..., :fm] = torch.einsum('bchwm,com->bohwm', xft[..., :fm], w_c[:, :, :fm])
             out = torch.fft.irfft(out_ft, n=n, norm='ortho')
             return out.permute(0, 4, 2, 3, 1).contiguous()
         elif self.axis == 'H':
             xp = x.permute(0, 4, 1, 3, 2).contiguous()
-            n  = H
+            n = H
             xft = torch.fft.rfft(xp, norm='ortho')
-            fm  = min(self.modes, n // 2 + 1)
+            fm = min(self.modes, n // 2 + 1)
             out_ft = torch.zeros(B, C, D, W, n // 2 + 1, dtype=torch.cfloat, device=x.device)
             out_ft[..., :fm] = torch.einsum('bcdwm,com->bodwm', xft[..., :fm], w_c[:, :, :fm])
             out = torch.fft.irfft(out_ft, n=n, norm='ortho')
             return out.permute(0, 2, 4, 3, 1).contiguous()
         else:
             xp = x.permute(0, 4, 1, 2, 3).contiguous()
-            n  = W
+            n = W
             xft = torch.fft.rfft(xp, norm='ortho')
-            fm  = min(self.modes, n // 2 + 1)
+            fm = min(self.modes, n // 2 + 1)
             out_ft = torch.zeros(B, C, D, H, n // 2 + 1, dtype=torch.cfloat, device=x.device)
             out_ft[..., :fm] = torch.einsum('bcdhm,com->bodhm', xft[..., :fm], w_c[:, :, :fm])
             out = torch.fft.irfft(out_ft, n=n, norm='ortho')
@@ -193,7 +187,7 @@ class _AxisSpectralConv2D(nn.Module):
         super().__init__()
         assert axis in ('H', 'W')
         self.modes = modes
-        self.axis  = axis
+        self.axis = axis
         self.H, self.W = H, W
         scale = 1.0 / (dim * dim)
         self.weights = nn.Parameter(scale * torch.randn(dim, dim, modes, 2))
@@ -202,19 +196,19 @@ class _AxisSpectralConv2D(nn.Module):
         B, H, W, C = x.shape
         w_c = torch.view_as_complex(self.weights.contiguous())
         if self.axis == 'H':
-            xp  = x.permute(0, 3, 2, 1).contiguous()
-            n   = H
+            xp = x.permute(0, 3, 2, 1).contiguous()
+            n = H
             xft = torch.fft.rfft(xp, norm='ortho')
-            fm  = min(self.modes, n // 2 + 1)
+            fm = min(self.modes, n // 2 + 1)
             out_ft = torch.zeros(B, C, W, n // 2 + 1, dtype=torch.cfloat, device=x.device)
             out_ft[..., :fm] = torch.einsum('bcwm,com->bowm', xft[..., :fm], w_c[:, :, :fm])
             out = torch.fft.irfft(out_ft, n=n, norm='ortho')
             return out.permute(0, 3, 2, 1).contiguous()
         else:
-            xp  = x.permute(0, 3, 1, 2).contiguous()
-            n   = W
+            xp = x.permute(0, 3, 1, 2).contiguous()
+            n = W
             xft = torch.fft.rfft(xp, norm='ortho')
-            fm  = min(self.modes, n // 2 + 1)
+            fm = min(self.modes, n // 2 + 1)
             out_ft = torch.zeros(B, C, H, n // 2 + 1, dtype=torch.cfloat, device=x.device)
             out_ft[..., :fm] = torch.einsum('bchm,com->bohm', xft[..., :fm], w_c[:, :, :fm])
             out = torch.fft.irfft(out_ft, n=n, norm='ortho')
@@ -256,23 +250,20 @@ class SpatiotemporalBlock(nn.Module):
             dropout=dropout, slice_num=slice_num, H=H, W=W)
 
         self.ln_2 = nn.LayerNorm(hidden_dim)
-        self.mlp  = SwiGLU(hidden_dim, int(hidden_dim * mlp_ratio * 2 / 3), hidden_dim)
+        self.mlp = SwiGLU(hidden_dim, int(hidden_dim * mlp_ratio * 2 / 3), hidden_dim)
 
     def forward(self, fx):  # (B, N=D*H*W, C)
         B, N, C = fx.shape
         D, H, W = self.D, self.H, self.W
         half = C // 2
 
-
         fx3d = fx.reshape(B, D, H, W, C).permute(0, 4, 1, 2, 3).contiguous()
         fx = fx + self.cpe(fx3d).permute(0, 2, 3, 4, 1).reshape(B, N, C)
 
         x_spec, x_phys = fx.chunk(2, dim=-1)
 
-
         spec_out = x_spec + self.spectral(
             self.ln_spec(x_spec).reshape(B, D, H, W, half)).reshape(B, N, half)
-
 
         x_phys_pf = self.ln_1(x_phys).reshape(B * D, H * W, half)
         phys_out = x_phys + self.Attn(x_phys_pf).reshape(B, N, half)
@@ -297,8 +288,8 @@ class SpatialBlock(nn.Module):
         self.cpe = nn.Conv2d(hidden_dim, hidden_dim, 3, 1, 1, groups=hidden_dim)
 
         self.ln_spec = nn.LayerNorm(half)
-        self.spectral = FactorizedSpectralConv2D(half, modes=spectral_modes_hw, H=H, W=W,
-                                                  modes_w=spectral_modes_w)
+        self.spectral = FactorizedSpectralConv2D(
+            half, modes=spectral_modes_hw, H=H, W=W, modes_w=spectral_modes_w)
 
         self.ln_1 = nn.LayerNorm(half)
         self.Attn = PhysicsAttention2D(
@@ -306,7 +297,7 @@ class SpatialBlock(nn.Module):
             dropout=dropout, slice_num=slice_num, H=H, W=W)
 
         self.ln_2 = nn.LayerNorm(hidden_dim)
-        self.mlp  = SwiGLU(hidden_dim, int(hidden_dim * mlp_ratio * 2 / 3), hidden_dim)
+        self.mlp = SwiGLU(hidden_dim, int(hidden_dim * mlp_ratio * 2 / 3), hidden_dim)
 
         if last_out_dim > 0:
             self.ln_3 = nn.LayerNorm(hidden_dim)
@@ -364,18 +355,14 @@ class TransolverSigma(BaseModel):
         n1 = n_layers // 2
         n2 = n_layers - n1
 
-
         pos = _unified_pos_2d(H, W, ref)
         self.register_buffer('pos', pos)
-
 
         t = torch.linspace(0, 1, D)
         self.register_buffer('t_coord', t)
 
-
         self.preprocess = MLP(fun_dim + ref ** 2 + 1, n_hidden * 2, n_hidden, act=act)
         self.placeholder = nn.Parameter((1.0 / n_hidden) * torch.rand(n_hidden))
-
 
         self.stage1 = nn.ModuleList([
             SpatiotemporalBlock(
@@ -390,9 +377,7 @@ class TransolverSigma(BaseModel):
             for _ in range(n1)
         ])
 
-
         self.time_agg = TemporalAggregator(n_hidden)
-
 
         self.stage2 = nn.ModuleList([
             SpatialBlock(
@@ -424,23 +409,19 @@ class TransolverSigma(BaseModel):
         B, D, H, W, C_in = x.shape
         N2 = H * W
 
-
-        x_flat = x.reshape(B * D, N2, C_in)                      # (B*D, H*W, C_in)
-        pos    = self.pos.unsqueeze(0).expand(B * D, -1, -1)     # (B*D, H*W, ref²)
-        t = self.t_coord.unsqueeze(-1).expand(D, N2)              # (D, H*W)
+        x_flat = x.reshape(B * D, N2, C_in)  # (B*D, H*W, C_in)
+        pos = self.pos.unsqueeze(0).expand(B * D, -1, -1)  # (B*D, H*W, ref²)
+        t = self.t_coord.unsqueeze(-1).expand(D, N2)  # (D, H*W)
         t = t.unsqueeze(0).expand(B, -1, -1).reshape(B * D, N2, 1)
-        fx = self.preprocess(torch.cat([pos, x_flat, t], dim=-1)) # (B*D, H*W, n_hidden)
+        fx = self.preprocess(torch.cat([pos, x_flat, t], dim=-1))  # (B*D, H*W, n_hidden)
         fx = fx + self.placeholder[None, None, :]
-
 
         fx = fx.reshape(B, D * N2, -1)
         for block in self.stage1:
             fx = block(fx)  # (B, D*H*W, C)
 
-
         fx = fx.reshape(B, D, N2, -1).permute(0, 2, 1, 3)  # (B, H*W, D, C)
-        fx = self.time_agg(fx)                               # (B, H*W, C)
-
+        fx = self.time_agg(fx)  # (B, H*W, C)
 
         for block in self.stage2:
             fx = block(fx)

@@ -1,17 +1,18 @@
 exp_name: "transolver_sigma_cylinder"
 seed: 0
-results_path: "./logs/"
+results_path: "./results/"
 
 # data
 dataset_name: "cylinder"
-dataset_root: "./data/"
+dataset_root: "./data/" # set to the local dataset root
 num_workers: 4
 normalizer: "gaussian"
-mask_prob: 0.0
-noise_scale: 0.0
+mask_prob: 0.0 # only applicable for numerical data
+noise_scale: 0.0 # only applicable for numerical data
 
 # model
 model_name: "transolver_sigma"
+checkpoint_path: "" # set to a simulated-training checkpoint for finetuning
 n_hidden: 128
 n_head: 8
 n_layers: 8
@@ -23,11 +24,10 @@ ref: 4
 dropout: 0.0
 act: "gelu"
 
-checkpoint_path: ""
 # training
 is_use_tb: False
 scheduler: cosine
-step_size: 1000
+step_size: 1000 # only applicable for step scheduler
 num_update: 20000
 train_batch_size: 4
 test_batch_size: 4

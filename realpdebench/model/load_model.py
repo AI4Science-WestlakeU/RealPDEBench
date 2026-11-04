@@ -157,6 +157,7 @@ def load_model(train_dataset, device='cpu', **kwargs):
             act=kwargs['act'],
             spectral_modes_d=kwargs['spectral_modes_d'],
             spectral_modes_hw=kwargs['spectral_modes_hw'],
+            spectral_modes_w=kwargs.get('spectral_modes_w'),
             ref=kwargs['ref'],
         ).to(device)
 
