@@ -1,0 +1,39 @@
+exp_name: "transolver_sigma_controlled_cylinder"
+seed: 0
+results_path: "./logs/"
+
+# data
+dataset_name: "controlled_cylinder"
+dataset_root: "./data/"
+num_workers: 4
+normalizer: "gaussian"
+mask_prob: 0.0
+noise_scale: 0.0
+
+# model
+model_name: "transolver_sigma"
+n_hidden: 128
+n_head: 8
+n_layers: 8
+mlp_ratio: 2
+slice_num: 32
+spectral_modes_d: 8
+spectral_modes_hw: 16
+ref: 4
+dropout: 0.0
+act: "gelu"
+
+checkpoint_path: ""
+# training
+is_use_tb: False
+scheduler: cosine
+step_size: 1000
+num_update: 20000
+train_batch_size: 4
+test_batch_size: 4
+lr: 0.001
+clip_grad_norm: 0.
+
+# evaluation
+N_autoregressive: 1
+N_plot: 3

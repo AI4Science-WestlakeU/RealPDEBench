@@ -142,6 +142,24 @@ def load_model(train_dataset, device='cpu', **kwargs):
             device=device
         ).to(device)
 
+    elif model_name == 'transolver_sigma':
+        from realpdebench.model.transolver_sigma import TransolverSigma
+
+        model = TransolverSigma(
+            shape_in=input_shape,
+            shape_out=output_shape,
+            n_hidden=kwargs['n_hidden'],
+            n_head=kwargs['n_head'],
+            n_layers=kwargs['n_layers'],
+            mlp_ratio=kwargs['mlp_ratio'],
+            slice_num=kwargs['slice_num'],
+            dropout=kwargs['dropout'],
+            act=kwargs['act'],
+            spectral_modes_d=kwargs['spectral_modes_d'],
+            spectral_modes_hw=kwargs['spectral_modes_hw'],
+            ref=kwargs['ref'],
+        ).to(device)
+
     elif model_name == 'transolver':
         from realpdebench.model.TRANSOLVER_libs.Transolver_Structured_Mesh_3D import Model
         
