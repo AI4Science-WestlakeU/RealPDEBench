@@ -450,4 +450,3 @@ class TransolverSigma(BaseModel):
     def train_loss(self, input, target):
         pred = self.forward(input)
         return (pred - target) ** 2
-
