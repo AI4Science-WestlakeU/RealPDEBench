@@ -272,6 +272,13 @@ If you find our work and/or our code useful, please cite us via:
 
 ------
 
+## Optional robustness evaluation
+
+The [cylinder missing-observation evaluation](docs/missing_observation_evaluation.md)
+compares scattered and contiguous missing velocity observations using the released
+UNet checkpoint and ten OOD trajectories. It includes a standalone runner, matched
+mask/filling controls, regional metrics and CPU/CUDA prediction support.
+
 ## 📚 Related Resources
 
 - AI for Scientific Simulation and Discovery Lab: https://github.com/AI4Science-WestlakeU

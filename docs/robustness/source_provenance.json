@@ -1,0 +1,13 @@
+{
+  "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+  "original_local_metadata_hashes": {
+    "metadata_out_dist_test_params_real.json": "070551d4a973b3eef897cdbeacbbebf3ba68fb01a8a6f8c139653b9b907e3a68",
+    "metadata_hf_dataset_train_index_real.json": "b98999baa6c34ef3e996ee6bc211e75755f047a8f9460e779a4da8768f137587",
+    "Confirmation_Window_Provenance.json": "36c9217ef40fe2eb716b03d5132e6d44c83bafdc4f469edba37097ea88ae8d3b"
+  },
+  "source_paths": [
+    "cylinder/out_dist_test_params_real.json",
+    "cylinder/hf_dataset/train_index_real.json"
+  ],
+  "range_selection": "Previously frozen median eligible official test window per OOD trajectory; unchanged in the integration rerun"
+}

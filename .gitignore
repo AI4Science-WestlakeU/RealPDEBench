@@ -27,3 +27,6 @@ sandbox/
 real_benchmark_old/
 scripts/
 hf_upload_test/
+
+# Downloaded robustness checkpoint and velocity windows
+.robustness_cache/

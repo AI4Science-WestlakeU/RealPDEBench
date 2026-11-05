@@ -1,0 +1,282 @@
+[
+  {
+    "ordinal": 0,
+    "window_file": "ood_1781.h5_1980.npz",
+    "sim_id": "1781.h5",
+    "time_id": 1980,
+    "mask_seed": 20261107,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00010-of-00073.arrow",
+    "full_shard_lfs_sha256": "d233672c894325d059cdf906aa7df9b29a30b6611308ce9dba99fd73ad6ad03b",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 64883264,
+        "end": 66193983,
+        "sha256": "7433529e197b070890d07816bd6ebf2de676aacb330bf1dec23c5c48b5a37478"
+      },
+      {
+        "column": "v",
+        "start": 326371920,
+        "end": 327682639,
+        "sha256": "b9e462e4a8a42374aff43c09aa66266b7596d9254728619215000baf229366fa"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "c0c406c9e0b6b83c583a7fdd3986c4141173540ec4ea4106e745a512afbafacb"
+  },
+  {
+    "ordinal": 1,
+    "window_file": "ood_1875.h5_1880.npz",
+    "sim_id": "1875.h5",
+    "time_id": 1880,
+    "mask_seed": 20261108,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00010-of-00073.arrow",
+    "full_shard_lfs_sha256": "d233672c894325d059cdf906aa7df9b29a30b6611308ce9dba99fd73ad6ad03b",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 192350784,
+        "end": 193661503,
+        "sha256": "4825332ea91e7f30aa62440507ddb88f95aca00e2914f4465e0bfd6eee3ab4a5"
+      },
+      {
+        "column": "v",
+        "start": 453839440,
+        "end": 455150159,
+        "sha256": "0c96c845a9e2a038c30e773e10c79cc91821c4b25346aa0b5f9e91575eb14644"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "d4deaf6162a1171951860bd6981b4b72ceaaa01c3786a7b1b383922d6e938f2f"
+  },
+  {
+    "ordinal": 2,
+    "window_file": "ood_2156.h5_1860.npz",
+    "sim_id": "2156.h5",
+    "time_id": 1860,
+    "mask_seed": 20261109,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00011-of-00073.arrow",
+    "full_shard_lfs_sha256": "2032ea2f042ae8aa7081ca79fced9f69522726b94a08c2476e097b66ec4ab1fc",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 191695424,
+        "end": 193006143,
+        "sha256": "96a51535d8ab64190a493cf19d00bd97d62a2572bdaf4f4ff9277a1923b620a0"
+      },
+      {
+        "column": "v",
+        "start": 453184080,
+        "end": 454494799,
+        "sha256": "3b70cfe055f0c35f7b273fb9505f5243a02b8218962e575101de9dbafeeb7822"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "6259190b7a2cff0c12dc1c4c34d91e8f72efe940917d63e4869c528a33e75abe"
+  },
+  {
+    "ordinal": 3,
+    "window_file": "ood_2531.h5_1980.npz",
+    "sim_id": "2531.h5",
+    "time_id": 1980,
+    "mask_seed": 20261110,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00013-of-00073.arrow",
+    "full_shard_lfs_sha256": "0f147c3bf6c6f699ceaeed60f8eef31e5f0c344866712d7bbf210d735f86c7bc",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 195627576,
+        "end": 196938295,
+        "sha256": "9abcf6b020d8fecdfb39e41e8d968fe16f25ed0712689457199679bdd6479dbb"
+      },
+      {
+        "column": "v",
+        "start": 457116232,
+        "end": 458426951,
+        "sha256": "b3770044a67e41d7279cd9d52c0a7a55e07d7d803210eb79e370c2b55167960c"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "8a70e6ba327d718fcc9e9d77edf04ac897af4c65b46bc0e58fb9c06170e3c840"
+  },
+  {
+    "ordinal": 4,
+    "window_file": "ood_11062.h5_2060.npz",
+    "sim_id": "11062.h5",
+    "time_id": 2060,
+    "mask_seed": 20261111,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00005-of-00073.arrow",
+    "full_shard_lfs_sha256": "9bc705741a7f1fed6007a9bdb5238d81e321409ea8fbaa9ea17ac27e7557008e",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 198249008,
+        "end": 199559727,
+        "sha256": "ca4ffdc21496dcf90ef2d52a72296a797e74ec08627b37d30286a422a70dbfab"
+      },
+      {
+        "column": "v",
+        "start": 459737664,
+        "end": 461048383,
+        "sha256": "d02e9469955e668a2833d16b5bb4ad5a4ef20e0875a17c7bb91640a71a89adfe"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "85dfcc2aa86208b9e474c75e9d0f793908d7f0ce1fb1b0d41725f3961fc29b72"
+  },
+  {
+    "ordinal": 5,
+    "window_file": "ood_11156.h5_1900.npz",
+    "sim_id": "11156.h5",
+    "time_id": 1900,
+    "mask_seed": 20261112,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00006-of-00073.arrow",
+    "full_shard_lfs_sha256": "4f1cf74320004d9818350087fbd3194fc60e4e232ae655d8fa291d8cd2169f55",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 62261792,
+        "end": 63572511,
+        "sha256": "bf3d48525fc6660bdddc90921f494dc2e2b2168eaa794f0732ee96fe0f8d9377"
+      },
+      {
+        "column": "v",
+        "start": 323750448,
+        "end": 325061167,
+        "sha256": "40d00353825d95730f460caa691ec6c06265bde171298676b7c6c918b521d1ed"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "c10c6d3fa4b113b0138d6a1bf96b96e995d6975dc63f4622d738e0c088cd6724"
+  },
+  {
+    "ordinal": 6,
+    "window_file": "ood_11250.h5_1960.npz",
+    "sim_id": "11250.h5",
+    "time_id": 1960,
+    "mask_seed": 20261113,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00006-of-00073.arrow",
+    "full_shard_lfs_sha256": "4f1cf74320004d9818350087fbd3194fc60e4e232ae655d8fa291d8cd2169f55",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 194972192,
+        "end": 196282911,
+        "sha256": "a2caeddae5a5d7b4fa36ab696599355f9717127ada4f0178746ca709d8e84697"
+      },
+      {
+        "column": "v",
+        "start": 456460848,
+        "end": 457771567,
+        "sha256": "e0461127047ff5f7e857133b8de3c044667bd5a3945fa497e0be9770d0407d13"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "d1c2932be5be1284417d1853ab282110a64d4764090b9bc70bc1d0a915e8c975"
+  },
+  {
+    "ordinal": 7,
+    "window_file": "ood_11343.h5_1720.npz",
+    "sim_id": "11343.h5",
+    "time_id": 1720,
+    "mask_seed": 20261114,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00007-of-00073.arrow",
+    "full_shard_lfs_sha256": "e203ad0ef26e099f81d5c13c4b49d6b97329a4036a3a516ac48d5ad64d33ad2a",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 56363536,
+        "end": 57674255,
+        "sha256": "4f3eba64d9ca6be7d80d9f119a335985c9099bdbf6441cc75ea0b355adf19b2d"
+      },
+      {
+        "column": "v",
+        "start": 317852192,
+        "end": 319162911,
+        "sha256": "c53954a2e1cdff015b5230b8613d63210fca7faa60eb5a7c966306f70c2fd178"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "d85c17795d6e35c497694e9da892569b50bd031379c257497bcce514b02969b5"
+  },
+  {
+    "ordinal": 8,
+    "window_file": "ood_11625.h5_1860.npz",
+    "sim_id": "11625.h5",
+    "time_id": 1860,
+    "mask_seed": 20261115,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00008-of-00073.arrow",
+    "full_shard_lfs_sha256": "285f6464a93def4b53861e7f4be91ea745ce7496ef8a49726024af0e218e38e7",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 191695424,
+        "end": 193006143,
+        "sha256": "a2a944ab9f1344f9df20f1ad947ba9bcd4fb986bf31015a50c892b88fccc58cd"
+      },
+      {
+        "column": "v",
+        "start": 453184080,
+        "end": 454494799,
+        "sha256": "8590ea8bdc4cbb52a4bec07d463901e96e7a116fe52860378050fe9e58f2b45c"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "d6a84baf7272c45edb1e31bdbe2b64ed707bebbb16235e5c793bb6a39b6ebe0b"
+  },
+  {
+    "ordinal": 9,
+    "window_file": "ood_11718.h5_2000.npz",
+    "sim_id": "11718.h5",
+    "time_id": 2000,
+    "mask_seed": 20261116,
+    "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+    "shard": "cylinder/hf_dataset/real/data-00009-of-00073.arrow",
+    "full_shard_lfs_sha256": "67687321e79f12671118c5bec9e8aa8232ac0574faeb9e89ffbc64698f3ba918",
+    "full_shard_hash_verified": false,
+    "range_hashes": [
+      {
+        "column": "u",
+        "start": 65538624,
+        "end": 66849343,
+        "sha256": "12251382c81492d8121cc58239ef02c109c46a11ed25efdf3c50174deada268c"
+      },
+      {
+        "column": "v",
+        "start": 327027280,
+        "end": 328337999,
+        "sha256": "aaeccd1aea1e69b6753caacf927237a4214609417519a73909a21972cb9a1e9c"
+      }
+    ],
+    "official_ood_group": true,
+    "released_train_indices_same_trajectory": 0,
+    "npz_sha256": "59711cb93d3d83260e20aaac6499f602e1ddffc805d231ee8704d9c309c65aec"
+  }
+]

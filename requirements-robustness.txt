@@ -1,0 +1,9 @@
+# Install torch/torchvision for your chosen CPU or CUDA backend separately.
+numpy>=1.24
+scipy>=1.10
+PyYAML>=6
+tqdm>=4.65
+pillow>=10
+einops>=0.8
+einops-exts==0.0.4
+rotary-embedding-torch>=0.9
