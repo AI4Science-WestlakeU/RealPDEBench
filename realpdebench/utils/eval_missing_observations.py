@@ -2,7 +2,7 @@
 
 Run from an installed checkout (all dependencies are in pyproject.toml)::
 
-    python -m realpdebench.eval_missing_observations --output-dir results/missing --download
+    python -m realpdebench.utils.eval_missing_observations --output-dir results/missing --download
 
 Use --device cuda for GPU inference; --max-windows 1 for a smoke test;
 --seed-offsets 0 1 2 for repeated masks. Longer autoregressive runs use
@@ -177,7 +177,7 @@ def parse_args(argv=None):
     p.add_argument(
         "--config",
         type=Path,
-        default=Path(__file__).parent / "configs/cylinder/missing_observation_ood.json",
+        default=Path(__file__).resolve().parents[1] / "configs/cylinder/missing_observation_ood.json",
         help="Single OOD cohort, pinned assets and byte-range configuration",
     )
     p.add_argument(

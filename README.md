@@ -28,7 +28,7 @@
 
 ## ‼️ News
 
-[2026.11] Added an optional [cylinder missing-observation evaluation](realpdebench/eval_missing_observations.py) with matched masks, filling controls and regional metrics.
+[2026.11] Added an optional [cylinder missing-observation evaluation](realpdebench/utils/eval_missing_observations.py) with matched masks, filling controls and regional metrics.
 
 [2026.11] We have added the latest model, [**Transformer-σ**](https://arxiv.org/abs/2609.37279), to this repository! 
 
