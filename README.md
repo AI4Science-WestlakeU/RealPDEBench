@@ -28,6 +28,8 @@
 
 ## ‼️ News
 
+[2026.11] Added an optional [cylinder missing-observation evaluation](realpdebench/eval_missing_observations.py) with matched masks, filling controls and regional metrics.
+
 [2026.11] We have added the latest model, [**Transformer-σ**](https://arxiv.org/abs/2609.37279), to this repository! 
 
 [2026.07] The NeurIPS [RealPDE Competition](https://realpdecompetition.github.io/) is now live! Join us to tackle real-world physical systems, with generous prizes for winning teams.
@@ -271,13 +273,6 @@ If you find our work and/or our code useful, please cite us via:
 
 
 ------
-
-## Optional robustness evaluation
-
-The [cylinder missing-observation evaluation](docs/missing_observation_evaluation.md)
-compares scattered and contiguous missing velocity observations using the released
-UNet checkpoint and ten OOD trajectories. It includes a standalone runner, matched
-mask/filling controls, regional metrics and CPU/CUDA prediction support.
 
 ## 📚 Related Resources
 

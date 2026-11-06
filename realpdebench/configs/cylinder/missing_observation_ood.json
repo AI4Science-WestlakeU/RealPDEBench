@@ -1,0 +1,321 @@
+{
+  "model_revision": "58898901ae1c557f810767b03b7bf5004f6ead63",
+  "dataset_revision": "0ae4426085d250787f96d5456bc0d30ce5f277d2",
+  "assets": {
+    "unet_real.pth": {
+      "url": "https://huggingface.co/AI4Science-WestlakeU/RealPDEBench-models/resolve/58898901ae1c557f810767b03b7bf5004f6ead63/cylinder/unet/real.pth",
+      "sha256": "4d6b4342a3a4bc9d03a40c99c1fc562136f4c1f259c601682ccde580db6cfc97"
+    },
+    "unet_config.yaml": {
+      "url": "https://huggingface.co/AI4Science-WestlakeU/RealPDEBench-models/resolve/58898901ae1c557f810767b03b7bf5004f6ead63/configs/cylinder/unet.yaml",
+      "sha256": "0d355bb50a2153d8e04fbc08c1fc885c0342ec848d5a1bd3c7dc6ac03fb5d5d4"
+    },
+    "mean_std.pt": {
+      "url": "https://huggingface.co/datasets/AI4Science-WestlakeU/RealPDEBench/resolve/0ae4426085d250787f96d5456bc0d30ce5f277d2/cylinder/mean_std.pt",
+      "sha256": "2dff4af77180413434c2292c5c05e6cd7561f89cfecaa6b88d9c41f48da04efa"
+    }
+  },
+  "official_ood_ids": [
+    "11062.h5",
+    "11156.h5",
+    "11250.h5",
+    "11343.h5",
+    "11625.h5",
+    "11718.h5",
+    "1781.h5",
+    "1875.h5",
+    "2156.h5",
+    "2531.h5"
+  ],
+  "released_train_sim_ids": [
+    "10031.h5",
+    "10125.h5",
+    "10218.h5",
+    "10312.h5",
+    "10406.h5",
+    "10500.h5",
+    "10593.h5",
+    "10687.h5",
+    "10781.h5",
+    "10875.h5",
+    "10968.h5",
+    "11437.h5",
+    "11531.h5",
+    "11812.h5",
+    "2062.h5",
+    "2250.h5",
+    "2343.h5",
+    "2437.h5",
+    "2718.h5",
+    "2812.h5",
+    "2906.h5",
+    "3000.h5",
+    "3187.h5",
+    "3281.h5",
+    "3375.h5",
+    "3468.h5",
+    "3843.h5",
+    "3937.h5",
+    "4031.h5",
+    "4218.h5",
+    "4312.h5",
+    "4406.h5",
+    "4500.h5",
+    "4593.h5",
+    "4687.h5",
+    "4781.h5",
+    "4875.h5",
+    "5250.h5",
+    "5343.h5",
+    "5531.h5",
+    "5625.h5",
+    "5718.h5",
+    "6000.h5",
+    "6093.h5",
+    "6187.h5",
+    "6562.h5",
+    "6656.h5",
+    "6843.h5",
+    "7125.h5",
+    "7218.h5",
+    "7406.h5",
+    "7500.h5",
+    "7781.h5",
+    "7875.h5",
+    "8062.h5",
+    "8156.h5",
+    "8250.h5",
+    "8343.h5",
+    "8531.h5",
+    "8625.h5",
+    "8718.h5",
+    "8812.h5",
+    "8906.h5",
+    "9000.h5",
+    "9093.h5",
+    "9187.h5",
+    "9281.h5",
+    "9375.h5",
+    "9468.h5",
+    "9562.h5",
+    "9843.h5",
+    "9937.h5"
+  ],
+  "source_paths": [
+    "cylinder/out_dist_test_params_real.json",
+    "cylinder/hf_dataset/train_index_real.json"
+  ],
+  "window_selection": "Frozen median eligible official test window per OOD trajectory",
+  "windows": [
+    {
+      "window_file": "ood_1781.h5_1980.npz",
+      "sim_id": "1781.h5",
+      "time_id": 1980,
+      "mask_seed": 20261107,
+      "shard": "cylinder/hf_dataset/real/data-00010-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 64883264,
+          "end": 66193983,
+          "sha256": "7433529e197b070890d07816bd6ebf2de676aacb330bf1dec23c5c48b5a37478"
+        },
+        {
+          "column": "v",
+          "start": 326371920,
+          "end": 327682639,
+          "sha256": "b9e462e4a8a42374aff43c09aa66266b7596d9254728619215000baf229366fa"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_1875.h5_1880.npz",
+      "sim_id": "1875.h5",
+      "time_id": 1880,
+      "mask_seed": 20261108,
+      "shard": "cylinder/hf_dataset/real/data-00010-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 192350784,
+          "end": 193661503,
+          "sha256": "4825332ea91e7f30aa62440507ddb88f95aca00e2914f4465e0bfd6eee3ab4a5"
+        },
+        {
+          "column": "v",
+          "start": 453839440,
+          "end": 455150159,
+          "sha256": "0c96c845a9e2a038c30e773e10c79cc91821c4b25346aa0b5f9e91575eb14644"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_2156.h5_1860.npz",
+      "sim_id": "2156.h5",
+      "time_id": 1860,
+      "mask_seed": 20261109,
+      "shard": "cylinder/hf_dataset/real/data-00011-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 191695424,
+          "end": 193006143,
+          "sha256": "96a51535d8ab64190a493cf19d00bd97d62a2572bdaf4f4ff9277a1923b620a0"
+        },
+        {
+          "column": "v",
+          "start": 453184080,
+          "end": 454494799,
+          "sha256": "3b70cfe055f0c35f7b273fb9505f5243a02b8218962e575101de9dbafeeb7822"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_2531.h5_1980.npz",
+      "sim_id": "2531.h5",
+      "time_id": 1980,
+      "mask_seed": 20261110,
+      "shard": "cylinder/hf_dataset/real/data-00013-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 195627576,
+          "end": 196938295,
+          "sha256": "9abcf6b020d8fecdfb39e41e8d968fe16f25ed0712689457199679bdd6479dbb"
+        },
+        {
+          "column": "v",
+          "start": 457116232,
+          "end": 458426951,
+          "sha256": "b3770044a67e41d7279cd9d52c0a7a55e07d7d803210eb79e370c2b55167960c"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_11062.h5_2060.npz",
+      "sim_id": "11062.h5",
+      "time_id": 2060,
+      "mask_seed": 20261111,
+      "shard": "cylinder/hf_dataset/real/data-00005-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 198249008,
+          "end": 199559727,
+          "sha256": "ca4ffdc21496dcf90ef2d52a72296a797e74ec08627b37d30286a422a70dbfab"
+        },
+        {
+          "column": "v",
+          "start": 459737664,
+          "end": 461048383,
+          "sha256": "d02e9469955e668a2833d16b5bb4ad5a4ef20e0875a17c7bb91640a71a89adfe"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_11156.h5_1900.npz",
+      "sim_id": "11156.h5",
+      "time_id": 1900,
+      "mask_seed": 20261112,
+      "shard": "cylinder/hf_dataset/real/data-00006-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 62261792,
+          "end": 63572511,
+          "sha256": "bf3d48525fc6660bdddc90921f494dc2e2b2168eaa794f0732ee96fe0f8d9377"
+        },
+        {
+          "column": "v",
+          "start": 323750448,
+          "end": 325061167,
+          "sha256": "40d00353825d95730f460caa691ec6c06265bde171298676b7c6c918b521d1ed"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_11250.h5_1960.npz",
+      "sim_id": "11250.h5",
+      "time_id": 1960,
+      "mask_seed": 20261113,
+      "shard": "cylinder/hf_dataset/real/data-00006-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 194972192,
+          "end": 196282911,
+          "sha256": "a2caeddae5a5d7b4fa36ab696599355f9717127ada4f0178746ca709d8e84697"
+        },
+        {
+          "column": "v",
+          "start": 456460848,
+          "end": 457771567,
+          "sha256": "e0461127047ff5f7e857133b8de3c044667bd5a3945fa497e0be9770d0407d13"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_11343.h5_1720.npz",
+      "sim_id": "11343.h5",
+      "time_id": 1720,
+      "mask_seed": 20261114,
+      "shard": "cylinder/hf_dataset/real/data-00007-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 56363536,
+          "end": 57674255,
+          "sha256": "4f3eba64d9ca6be7d80d9f119a335985c9099bdbf6441cc75ea0b355adf19b2d"
+        },
+        {
+          "column": "v",
+          "start": 317852192,
+          "end": 319162911,
+          "sha256": "c53954a2e1cdff015b5230b8613d63210fca7faa60eb5a7c966306f70c2fd178"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_11625.h5_1860.npz",
+      "sim_id": "11625.h5",
+      "time_id": 1860,
+      "mask_seed": 20261115,
+      "shard": "cylinder/hf_dataset/real/data-00008-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 191695424,
+          "end": 193006143,
+          "sha256": "a2a944ab9f1344f9df20f1ad947ba9bcd4fb986bf31015a50c892b88fccc58cd"
+        },
+        {
+          "column": "v",
+          "start": 453184080,
+          "end": 454494799,
+          "sha256": "8590ea8bdc4cbb52a4bec07d463901e96e7a116fe52860378050fe9e58f2b45c"
+        }
+      ]
+    },
+    {
+      "window_file": "ood_11718.h5_2000.npz",
+      "sim_id": "11718.h5",
+      "time_id": 2000,
+      "mask_seed": 20261116,
+      "shard": "cylinder/hf_dataset/real/data-00009-of-00073.arrow",
+      "range_hashes": [
+        {
+          "column": "u",
+          "start": 65538624,
+          "end": 66849343,
+          "sha256": "12251382c81492d8121cc58239ef02c109c46a11ed25efdf3c50174deada268c"
+        },
+        {
+          "column": "v",
+          "start": 327027280,
+          "end": 328337999,
+          "sha256": "aaeccd1aea1e69b6753caacf927237a4214609417519a73909a21972cb9a1e9c"
+        }
+      ]
+    }
+  ]
+}
