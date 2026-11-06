@@ -70,6 +70,6 @@ include-package-data = true
 include = ["realpdebench", "realpdebench.*"]
 
 [tool.setuptools.package-data]
-realpdebench = ["configs/**/*.yaml", "configs/**/*.yml"]
+realpdebench = ["configs/**/*.yaml", "configs/**/*.yml", "configs/**/*.json"]
 
 
