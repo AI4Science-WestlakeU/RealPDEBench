@@ -28,6 +28,8 @@
 
 ## ‼️ News
 
+[2026.11] Added notes on [dataset versions](#dataset-versions). Use v2.0.0 to reproduce Table 1 of the paper and v2.0.1 for new experiments.
+
 [2026.11] Added an optional [cylinder missing-observation evaluation](realpdebench/utils/eval_missing_observations.py) with matched masks, filling controls and regional metrics.
 
 [2026.11] We have added the latest model, [**Transformer-σ**](https://arxiv.org/abs/2609.37279), to this repository! 
@@ -93,6 +95,30 @@ Tips:
 > **Note:** The Hugging Face dataset above is still the recommended way to download data (faster, and integrates with the `realpdebench` loaders). The raw HDF5 distribution below is provided for completeness, e.g., if you want to inspect the original simulation outputs or use them outside the RealPDEBench codebase.
 
 Raw HDF5 trajectories are hosted on the Westlake data distribution server: <https://realpdebench.westlake.edu.cn/>
+
+### Dataset versions
+
+The results in Table 1 were obtained using dataset v2.0.0. In v2.0.1, we corrected inconsistent unit conversions in a few trajectories in Cylinder, Controlled Cylinder, and Foil that had placed their values far outside the distribution of the remaining data. These corrections can substantially reduce errors, especially RMSE, so v2.0.1 results are not directly comparable to Table 1. Please use v2.0.0 to reproduce Table 1, and we recommend v2.0.1 for new experiments.
+
+| Version | Released | Use it for |
+|---|---|---|
+| v2.0.1 (latest) | 2026-09-18 | New experiments |
+| v2.0.0 | 2026-01-24 | Reproducing Table 1 of the [paper](https://arxiv.org/abs/2601.01829) |
+
+Only the real-world data of Cylinder, Controlled Cylinder, and Foil differ between the two versions. FSI and Combustion are the same in both.
+
+On Hugging Face, each version is a tag of the same name. Without `--revision`, the downloader fetches the latest version. To use v2.0.0, download it into a new directory with `--revision v2.0.0`, then set `dataset_root` in your config file (such as `configs/cylinder/fno.yaml`) to that directory. The downloader also saves `version.json` in that directory, and its `data_version` field records the version.
+
+```bash
+realpdebench download --dataset-root /path/to/data_v2.0.0 --scenario cylinder --what all --revision v2.0.0
+
+# with --hf_auto_download, pass the same revision to both train and eval
+python -m realpdebench.train --config configs/cylinder/fno.yaml --use_hf_dataset --hf_auto_download --hf_revision v2.0.0
+```
+
+Keep v2.0.0 in its own directory. `--hf_auto_download` only fetches missing files, so v2.0.1 files already in a directory stay as they are.
+
+The HDF5 archives on the Westlake server were updated to v2.0.1 on 2026-10-01. Archives downloaded before that date contain v2.0.0. For v2.0.0 now, use the Hugging Face dataset as above.
 
 ------
 
